@@ -6,6 +6,104 @@
     <title>Gestão de Ambulâncias</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="./styles.css">
+    <style>
+        /* Ajustes específicos do mapa: mais área útil, expansão e leitura rápida de status. */
+        #mapaPage { padding-top: 18px; }
+        .map-panel .panel-header { padding: 14px 18px; }
+        .map-panel .map-summary { margin: 10px 0 6px; }
+        .map-panel .map-toolbar { padding: 0 18px 10px; gap: 8px; }
+        .map-panel .map-toolbar p { margin: 0; }
+        .map-panel .map-layout {
+            grid-template-columns: minmax(0, 1fr) 230px;
+            gap: 14px;
+            padding: 0 18px 18px;
+            align-items: stretch;
+        }
+        .map-panel #fleetMap {
+            height: clamp(480px, 68vh, 780px);
+            min-height: 480px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .map-panel .map-devices {
+            max-height: 68vh;
+            padding: 0;
+        }
+        .map-device {
+            border-left: 5px solid var(--border);
+            transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+        }
+        .map-device.status-online {
+            border-color: var(--success);
+            background: #eaf8f1;
+            color: #0f6842;
+        }
+        .map-device.status-sem_comunicacao {
+            border-color: var(--warning);
+            background: #fff6e5;
+            color: #855000;
+        }
+        .map-device.status-offline {
+            border-color: var(--danger);
+            background: #fdecec;
+            color: #982020;
+        }
+        .map-device.status-inativo {
+            border-color: #667085;
+            background: #f1f3f5;
+            color: #475467;
+        }
+        .map-device:hover:not(:disabled), .map-device:focus-visible {
+            box-shadow: 0 0 0 2px rgba(21, 101, 192, .10);
+        }
+        body.map-modal-open { overflow: hidden; }
+        .map-panel.map-expanded {
+            position: fixed;
+            inset: 12px;
+            z-index: 2000;
+            margin: 0;
+            border-radius: 16px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+            overflow: auto;
+            background: var(--surface);
+        }
+        .map-panel.map-expanded .panel-header {
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            background: var(--surface);
+        }
+        .map-panel.map-expanded .map-layout {
+            grid-template-columns: minmax(0, 1fr) 280px;
+            height: calc(100vh - 255px);
+            min-height: 520px;
+        }
+        .map-panel.map-expanded #fleetMap {
+            height: 100%;
+            min-height: 520px;
+        }
+        .map-panel.map-expanded .map-devices {
+            max-height: none;
+            height: 100%;
+        }
+        @media (max-width: 1100px) {
+            .map-panel .map-layout { grid-template-columns: 1fr; }
+            .map-panel .map-devices { max-height: 180px; }
+            .map-panel.map-expanded .map-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .map-panel.map-expanded #fleetMap { height: calc(100vh - 360px); }
+            .map-panel.map-expanded .map-devices { height: auto; max-height: 150px; }
+        }
+        @media (max-width: 560px) {
+            #mapaPage { padding: 10px; }
+            .map-panel.map-expanded { inset: 4px; border-radius: 10px; }
+            .map-panel #fleetMap { min-height: 380px; height: 58vh; }
+            .map-panel.map-expanded #fleetMap { height: calc(100vh - 390px); min-height: 360px; }
+        }
+    </style>
 </head>
 <body>
     <div id="toast" class="toast" aria-live="polite"></div>
@@ -327,5 +425,53 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="./app.js"></script>
+    <script>
+        (() => {
+            const panel = document.getElementById('mapPanel');
+            const expandButton = document.getElementById('mapExpandButton');
+            const devices = document.getElementById('mapDevices');
+
+            function refreshLeafletSize() {
+                window.setTimeout(() => {
+                    try {
+                        fleetMap?.invalidateSize();
+                        fitFleetMap();
+                    } catch (_) {}
+                }, 120);
+            }
+
+            function setExpanded(expanded) {
+                panel.classList.toggle('map-expanded', expanded);
+                document.body.classList.toggle('map-modal-open', expanded);
+                expandButton.textContent = expanded ? 'Fechar tela cheia' : 'Expandir mapa';
+                expandButton.setAttribute('aria-expanded', String(expanded));
+                refreshLeafletSize();
+            }
+
+            expandButton.addEventListener('click', () => {
+                setExpanded(!panel.classList.contains('map-expanded'));
+            });
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && panel.classList.contains('map-expanded')) {
+                    setExpanded(false);
+                }
+            });
+
+            function colorStatusCards() {
+                devices.querySelectorAll('.map-device').forEach(button => {
+                    button.classList.remove('status-online', 'status-sem_comunicacao', 'status-offline', 'status-inativo');
+                    const text = button.textContent || '';
+                    if (text.includes('Sem comunicação')) button.classList.add('status-sem_comunicacao');
+                    else if (text.includes('Offline')) button.classList.add('status-offline');
+                    else if (text.includes('Inativo')) button.classList.add('status-inativo');
+                    else if (text.includes('Online')) button.classList.add('status-online');
+                });
+            }
+
+            new MutationObserver(colorStatusCards).observe(devices, {childList: true, subtree: true, characterData: true});
+            colorStatusCards();
+        })();
+    </script>
 </body>
 </html>
