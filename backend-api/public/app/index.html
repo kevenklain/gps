@@ -8,8 +8,51 @@
     <link rel="stylesheet" href="./styles.css">
     <style>
         /* Ajustes específicos do mapa: mais área útil, expansão e leitura rápida de status. */
+        .content-shell.map-page-active > .topbar { display: none; }
         #mapaPage { padding-top: 18px; }
         .map-panel .panel-header { padding: 14px 18px; }
+        .map-panel .panel-header .inline-controls {
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .map-panel .panel-header .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid transparent;
+            transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+        }
+        .map-panel .panel-header .btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(.98);
+            box-shadow: 0 4px 12px rgba(16, 24, 40, .10);
+        }
+        .map-panel #mapExpandButton {
+            background: #e8f0fe;
+            color: #185abc;
+            border-color: #b8cff7;
+        }
+        .map-panel #mapExpandButton::before { content: "⛶"; font-size: 16px; }
+        .map-panel #refreshButton {
+            background: #e7f7ef;
+            color: #0f6842;
+            border-color: #b7e5cc;
+        }
+        .map-panel #refreshButton::before { content: "↻"; font-size: 18px; line-height: 1; }
+        .map-panel #mapFitButton {
+            background: #f1ebff;
+            color: #6941c6;
+            border-color: #d8c7fb;
+        }
+        .map-panel #mapFitButton::before { content: "⌖"; font-size: 17px; }
+        .map-panel #mapWorldButton {
+            background: #e6f7f5;
+            color: #0f766e;
+            border-color: #b7e4df;
+        }
+        .map-panel #mapWorldButton::before { content: "🌍"; font-size: 16px; }
         .map-panel .map-summary { margin: 10px 0 6px; }
         .map-panel .map-toolbar { padding: 0 18px 10px; gap: 8px; }
         .map-panel .map-toolbar p { margin: 0; }
@@ -97,11 +140,16 @@
             .map-panel.map-expanded #fleetMap { height: calc(100vh - 360px); }
             .map-panel.map-expanded .map-devices { height: auto; max-height: 150px; }
         }
+        @media (max-width: 720px) {
+            .map-panel .panel-header .inline-controls { width: 100%; justify-content: stretch; }
+            .map-panel .panel-header .btn { flex: 1 1 calc(50% - 8px); }
+        }
         @media (max-width: 560px) {
             #mapaPage { padding: 10px; }
             .map-panel.map-expanded { inset: 4px; border-radius: 10px; }
             .map-panel #fleetMap { min-height: 380px; height: 58vh; }
             .map-panel.map-expanded #fleetMap { height: calc(100vh - 390px); min-height: 360px; }
+            .map-panel .panel-header .btn { flex-basis: 100%; }
         }
     </style>
 </head>
@@ -430,6 +478,12 @@
             const panel = document.getElementById('mapPanel');
             const expandButton = document.getElementById('mapExpandButton');
             const devices = document.getElementById('mapDevices');
+            const mapPage = document.getElementById('mapaPage');
+            const contentShell = document.querySelector('.content-shell');
+            const mapActions = panel.querySelector('.panel-header .inline-controls');
+            const refreshButton = document.getElementById('refreshButton');
+            const refreshOriginalParent = refreshButton.parentElement;
+            const fitButton = document.getElementById('mapFitButton');
 
             function refreshLeafletSize() {
                 window.setTimeout(() => {
@@ -438,6 +492,19 @@
                         fitFleetMap();
                     } catch (_) {}
                 }, 120);
+            }
+
+            function syncMapHeader() {
+                const mapActive = mapPage.classList.contains('active');
+                contentShell.classList.toggle('map-page-active', mapActive);
+
+                if (mapActive) {
+                    if (refreshButton.parentElement !== mapActions) {
+                        mapActions.insertBefore(refreshButton, fitButton);
+                    }
+                } else if (refreshButton.parentElement !== refreshOriginalParent) {
+                    refreshOriginalParent.appendChild(refreshButton);
+                }
             }
 
             function setExpanded(expanded) {
@@ -470,7 +537,9 @@
             }
 
             new MutationObserver(colorStatusCards).observe(devices, {childList: true, subtree: true, characterData: true});
+            new MutationObserver(syncMapHeader).observe(mapPage, {attributes: true, attributeFilter: ['class']});
             colorStatusCards();
+            syncMapHeader();
         })();
     </script>
 </body>
