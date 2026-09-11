@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Ambulâncias</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <main id="loginView" class="login-shell">
+        <section class="login-card">
+            <div class="brand-mark">🚑</div>
+            <h1>Gestão de Ambulâncias</h1>
+            <p class="muted">Painel web do MVP</p>
+
+            <form id="loginForm" class="stack-form">
+                <label>
+                    E-mail
+                    <input id="loginEmail" type="email" value="admin@ambulancias.local" required autocomplete="username">
+                </label>
+                <label>
+                    Senha
+                    <input id="loginSenha" type="password" value="admin123" required autocomplete="current-password">
+                </label>
+                <button class="btn primary" type="submit">Entrar</button>
+            </form>
+
+            <div class="hint">
+                <strong>Acesso inicial:</strong><br>
+                admin@ambulancias.local / admin123
+            </div>
+        </section>
+    </main>
+
+    <div id="appView" class="app-shell hidden">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-mark small">🚑</span>
+                <div>
+                    <strong>Ambulâncias</strong>
+                    <small>MVP</small>
+                </div>
+            </div>
+
+            <nav id="navigation" class="navigation">
+                <button data-page="dashboard" class="nav-item active">Visão geral</button>
+                <button data-page="mapa" class="nav-item">Mapa</button>
+                <button data-page="usuarios" class="nav-item admin-only">Usuários</button>
+                <button data-page="dispositivos" class="nav-item">Dispositivos</button>
+                <button data-page="localizacoes" class="nav-item">Localizações</button>
+            </nav>
+
+            <div class="sidebar-user">
+                <strong id="sidebarUserName">Usuário</strong>
+                <small id="sidebarUserType">-</small>
+                <button id="logoutButton" class="btn ghost full">Sair</button>
+            </div>
+        </aside>
+
+        <div class="content-shell">
+            <header class="topbar">
+                <div>
+                    <h2 id="pageTitle">Visão geral</h2>
+                    <p id="pageSubtitle" class="muted">Resumo atual da frota</p>
+                </div>
+                <button id="refreshButton" class="btn secondary">Atualizar</button>
+            </header>
+
+            <section id="dashboardPage" class="page active">
+                <div class="stats-grid">
+                    <article class="stat-card"><span>Total</span><strong id="statTotal">0</strong></article>
+                    <article class="stat-card"><span>Online</span><strong id="statOnline">0</strong></article>
+                    <article class="stat-card"><span>Sem comunicação</span><strong id="statWarning">0</strong></article>
+                    <article class="stat-card"><span>Offline</span><strong id="statOffline">0</strong></article>
+                </div>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Frota</h3>
+                            <p class="muted">Última posição conhecida de cada dispositivo.</p>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ambulância</th>
+                                    <th>Placa</th>
+                                    <th>Status</th>
+                                    <th>Localização</th>
+                                    <th>Velocidade</th>
+                                    <th>Bateria</th>
+                                    <th>Última comunicação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardDevicesBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <section id="mapaPage" class="page">
+                <section class="panel">
+                    <div class="panel-header wrap">
+                        <div>
+                            <h3>Mapa da frota</h3>
+                            <p class="muted">Última posição recebida. Clique em uma ambulância para ver os detalhes.</p>
+                        </div>
+                        <div class="inline-controls">
+                            <button id="mapFitButton" class="btn secondary">Ver todas</button>
+                            <button id="mapWorldButton" class="btn secondary">Mapa mundial</button>
+                        </div>
+                    </div>
+                    <p id="mapSummary" class="map-summary" aria-live="polite">Carregando ambulâncias...</p>
+                    <p id="mapError" class="map-error hidden" role="alert"></p>
+                    <div class="map-toolbar">
+                        <label>Exibir no mapa
+                            <select id="mapDeviceFilter"><option value="all">Todas as ambulâncias</option></select>
+                        </label>
+                        <button id="mapSimulationButton" class="btn primary admin-only" type="button">Iniciar simulação em Brasília</button>
+                        <p id="mapSimulationStatus" class="muted" aria-live="polite">Posições mais recentes atualizadas a cada 5 segundos enquanto o mapa estiver aberto.</p>
+                    </div>
+                    <div class="map-layout">
+                        <div id="fleetMap" aria-label="Mapa das ambulâncias"></div>
+                        <div id="mapDevices" class="map-devices" aria-label="Ambulâncias no mapa"></div>
+                    </div>
+                    <div class="map-legend">
+                        <span class="badge online">Online</span>
+                        <span class="badge sem_comunicacao">Sem comunicação</span>
+                        <span class="badge offline">Offline</span>
+                        <span class="badge inativo">Inativo</span>
+                        <span class="muted">Selecione todas ou uma ambulância. Os dados de exemplo em Brasília são fictícios.</span>
+                    </div>
+                </section>
+            </section>
+
+            <section id="usuariosPage" class="page">
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Usuários</h3>
+                            <p class="muted">Administradores e funcionários.</p>
+                        </div>
+                        <button id="newUserButton" class="btn primary">Novo usuário</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Tipo</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <section id="dispositivosPage" class="page">
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Dispositivos / Ambulâncias</h3>
+                            <p class="muted">Cada dispositivo representa o tablet vinculado a uma ambulância.</p>
+                        </div>
+                        <button id="newDeviceButton" class="btn primary admin-only">Novo dispositivo</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Identificador</th>
+                                    <th>Placa</th>
+                                    <th>Funcionário</th>
+                                    <th>KM</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="devicesBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <section id="localizacoesPage" class="page">
+                <section class="panel">
+                    <div class="panel-header wrap">
+                        <div>
+                            <h3>Histórico de localizações</h3>
+                            <p class="muted">Selecione um dispositivo para consultar os pontos GPS gravados.</p>
+                        </div>
+                        <div class="inline-controls">
+                            <select id="locationDeviceSelect"></select>
+                            <button id="loadLocationsButton" class="btn secondary">Carregar</button>
+                            <button id="simulateLocationButton" class="btn primary admin-only">Simular GPS</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th>Velocidade</th>
+                                    <th>Precisão</th>
+                                    <th>Bateria</th>
+                                </tr>
+                            </thead>
+                            <tbody id="locationsBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </div>
+
+    <dialog id="userDialog" class="modal">
+        <form id="userForm" class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="userDialogTitle">Novo usuário</h3>
+                    <p class="muted">Preencha os dados abaixo.</p>
+                </div>
+                <button type="button" class="icon-button" data-close-dialog="userDialog">×</button>
+            </div>
+            <input id="userId" type="hidden">
+            <label>Nome<input id="userName" required maxlength="150"></label>
+            <label>E-mail<input id="userEmail" type="email" required maxlength="150"></label>
+            <label>Senha <small id="userPasswordHint" class="muted">mínimo 6 caracteres</small><input id="userPassword" type="password" minlength="6"></label>
+            <label>Tipo
+                <select id="userType" required>
+                    <option value="funcionario">Funcionário</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </label>
+            <label class="checkbox-row"><input id="userActive" type="checkbox" checked> Usuário ativo</label>
+            <div class="modal-actions">
+                <button type="button" class="btn ghost" data-close-dialog="userDialog">Cancelar</button>
+                <button type="submit" class="btn primary">Salvar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="deviceDialog" class="modal">
+        <form id="deviceForm" class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="deviceDialogTitle">Novo dispositivo</h3>
+                    <p class="muted">Cadastre o tablet e os dados básicos da ambulância.</p>
+                </div>
+                <button type="button" class="icon-button" data-close-dialog="deviceDialog">×</button>
+            </div>
+            <input id="deviceId" type="hidden">
+            <label>Nome<input id="deviceName" required maxlength="100" placeholder="Ambulância 01"></label>
+            <label>Identificador<input id="deviceIdentifier" required maxlength="100" placeholder="TAB-AMB-001"></label>
+            <label>Placa<input id="devicePlate" maxlength="20" placeholder="ABC1D23"></label>
+            <label>Modelo do veículo<input id="deviceModel" maxlength="100" placeholder="Renault Master"></label>
+            <label>Quilometragem<input id="deviceMileage" type="number" min="0" step="0.01" value="0"></label>
+            <label>Funcionário responsável<select id="deviceUser"></select></label>
+            <label class="checkbox-row"><input id="deviceActive" type="checkbox" checked> Dispositivo ativo</label>
+            <div class="modal-actions">
+                <button type="button" class="btn ghost" data-close-dialog="deviceDialog">Cancelar</button>
+                <button type="submit" class="btn primary">Salvar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="tokenDialog" class="modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Token do dispositivo</h3>
+                    <p class="muted">Copie agora. O valor aberto não fica disponível depois.</p>
+                </div>
+                <button type="button" class="icon-button" data-close-dialog="tokenDialog">×</button>
+            </div>
+            <textarea id="deviceTokenOutput" class="token-output" readonly></textarea>
+            <div class="modal-actions">
+                <button id="copyTokenButton" type="button" class="btn primary">Copiar token</button>
+                <button type="button" class="btn ghost" data-close-dialog="tokenDialog">Fechar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="locationDialog" class="modal">
+        <form id="locationForm" class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Simular envio do tablet</h3>
+                    <p class="muted">Use o token do dispositivo para testar o POST /api/localizacoes.</p>
+                </div>
+                <button type="button" class="icon-button" data-close-dialog="locationDialog">×</button>
+            </div>
+            <label>Token do dispositivo<textarea id="locationDeviceToken" required rows="3" placeholder="Cole o device_token aqui"></textarea></label>
+            <div class="two-columns">
+                <label>Latitude<input id="locationLatitude" type="number" step="0.0000001" value="-25.4284000" required></label>
+                <label>Longitude<input id="locationLongitude" type="number" step="0.0000001" value="-49.2733000" required></label>
+            </div>
+            <div class="two-columns">
+                <label>Velocidade km/h<input id="locationSpeed" type="number" min="0" step="0.01" value="35"></label>
+                <label>Precisão GPS m<input id="locationAccuracy" type="number" min="0" step="0.01" value="8"></label>
+            </div>
+            <div class="two-columns">
+                <label>Bateria %<input id="locationBattery" type="number" min="0" max="100" value="80"></label>
+                <label>Quilometragem<input id="locationMileage" type="number" min="0" step="0.01" value="82541"></label>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn ghost" data-close-dialog="locationDialog">Cancelar</button>
+                <button type="submit" class="btn primary">Enviar GPS</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="./app.js"></script>
+</body>
+</html>

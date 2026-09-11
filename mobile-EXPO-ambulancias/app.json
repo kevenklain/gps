@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "Ambulância Monitoramento",
+    "slug": "ambulancia-monitoramento",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "ambulancias",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#17202b",
+    "ios": {
+      "bundleIdentifier": "com.empresa.ambulancias",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.empresa.ambulancias",
+      "adaptiveIcon": {
+        "backgroundColor": "#1565c0",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#17202b",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 96
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Permita que o aplicativo acesse sua localização para monitorar a ambulância.",
+          "locationAlwaysAndWhenInUsePermission": "Permita acesso à localização o tempo todo para continuar monitorando a ambulância em segundo plano.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

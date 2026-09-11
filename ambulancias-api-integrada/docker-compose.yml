@@ -1,0 +1,76 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ambulancias-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-ambulancias}
+      DB_USERNAME: ${DB_USERNAME:-ambulancias}
+      DB_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD no .env}
+    volumes:
+      # Codigo fica editavel no Windows/Linux.
+      - .:/var/www
+      # Vendor gerado na imagem nao e escondido pelo bind mount acima.
+      - vendor_data:/var/www/vendor
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    container_name: ambulancias-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-ambulancias}
+      POSTGRES_USER: ${DB_USERNAME:-ambulancias}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD no .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:latest
+    container_name: ambulancias-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Interface visual: navegador -> localhost:5050 -> pgAdmin -> postgres:5432.
+  # O pgAdmin usa o mesmo banco da API e preserva suas configuracoes em volume.
+  pgadmin:
+    image: dpage/pgadmin4:9.17
+    container_name: ambulancias-pgadmin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PGADMIN_PORT:-5050}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@ambulancias.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:?Configure PGADMIN_DEFAULT_PASSWORD no .env}
+      PGADMIN_DISABLE_POSTFIX: "true"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  vendor_data:
+  pgadmin_data:

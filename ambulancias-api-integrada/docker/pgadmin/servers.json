@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Ambulancias - PostgreSQL local",
+      "Group": "Projeto Ambulancias",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "ambulancias",
+      "Username": "ambulancias",
+      "SSLMode": "prefer"
+    }
+  }
+}

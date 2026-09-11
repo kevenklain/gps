@@ -1,0 +1,72 @@
+### 1) Health
+GET http://localhost:8000/api/health
+Accept: application/json
+
+### 2) Login admin
+POST http://localhost:8000/api/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "admin@ambulancias.local",
+  "senha": "admin123"
+}
+
+### Cole o token retornado aqui.
+@userToken = COLE_TOKEN_USUARIO
+
+### 3) Criar funcionario
+POST http://localhost:8000/api/usuarios
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nome": "Joao Motorista",
+  "email": "joao@empresa.com",
+  "senha": "123456",
+  "tipo": "funcionario"
+}
+
+### 4) Criar dispositivo / ambulancia
+### Guarde o device_token retornado.
+POST http://localhost:8000/api/dispositivos
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "usuario_id": 2,
+  "nome": "Ambulancia 01",
+  "identificador": "TAB-AMB-001",
+  "placa": "ABC1D23",
+  "modelo_veiculo": "Renault Master",
+  "quilometragem": 82540
+}
+
+@deviceToken = COLE_TOKEN_DISPOSITIVO
+
+### 5) Tablet envia localizacao
+POST http://localhost:8000/api/localizacoes
+X-Device-Token: {{deviceToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "latitude": -25.4284000,
+  "longitude": -49.2733000,
+  "velocidade": 32.5,
+  "precisao_gps": 6.8,
+  "bateria": 76,
+  "quilometragem": 82541.20
+}
+
+### 6) Painel
+GET http://localhost:8000/api/painel
+Authorization: Bearer {{userToken}}
+Accept: application/json
+
+### 7) Historico do dispositivo 1
+GET http://localhost:8000/api/dispositivos/1/localizacoes?limite=100
+Authorization: Bearer {{userToken}}
+Accept: application/json
