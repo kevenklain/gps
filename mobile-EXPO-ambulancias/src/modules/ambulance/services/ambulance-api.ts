@@ -1,7 +1,23 @@
+import { Platform } from 'react-native';
 import type { ApiErrorPayload, MobileContext } from '../types';
 
 function getApiBaseUrl(): string {
-  const configured = process.env.EXPO_PUBLIC_API_URL?.trim();
+  // A tela chama este cliente HTTP antes de autenticar no Laravel.
+  // Na web local, acompanha o host do navegador: localhost no computador
+  // ou o IP da rede quando a página é aberta em outro aparelho.
+  // No Android/iOS, usa o IP configurado para alcançar o computador da API.
+  const mobileApiUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
+  const webApiUrl = process.env.EXPO_PUBLIC_WEB_API_URL?.trim();
+  let configured = mobileApiUrl;
+
+  if (Platform.OS === 'web') {
+    if (webApiUrl) {
+      configured = webApiUrl;
+    } else if (typeof window !== 'undefined') {
+      const browserHostname = window.location.hostname;
+      configured = `${window.location.protocol}//${browserHostname}:8000`;
+    }
+  }
 
   if (!configured) {
     throw new Error(

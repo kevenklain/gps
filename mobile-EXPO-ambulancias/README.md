@@ -46,6 +46,14 @@ Android Emulator pode acessar o host por:
 EXPO_PUBLIC_API_URL=http://10.0.2.2:8000
 ```
 
+### Web e celular ao mesmo tempo
+
+`EXPO_PUBLIC_API_URL` define a API para Android/iOS (IP do computador na mesma rede Wi-Fi).
+Na web, o cliente usa automaticamente o protocolo e o host da página na porta `8000`:
+abrindo pelo localhost, acessa a API no localhost; abrindo pelo IP, acessa a API nesse IP.
+Para uma API hospedada ou porta diferente, preencha `EXPO_PUBLIC_WEB_API_URL` com sua URL completa.
+Após alterar o `.env`, reinicie o Expo e recarregue o aplicativo.
+
 ## 3. Instalar dependências
 
 ```bash

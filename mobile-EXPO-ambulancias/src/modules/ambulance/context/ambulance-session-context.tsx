@@ -68,7 +68,8 @@ export function AmbulanceSessionProvider({ children }: { children: ReactNode }) 
       // Se a tarefa já estava registrada pelo Android, este método apenas retorna.
       // Não pedimos nova permissão silenciosamente na restauração da sessão.
       try {
-        await startLocationTracking();
+        const mode = await startLocationTracking();
+        setTrackingPermission(mode ?? null);
       } catch {
         // A tela principal continuará disponível e explicará quando o rastreamento
         // precisar de uma development build ou de nova autorização do sistema.
@@ -117,8 +118,9 @@ export function AmbulanceSessionProvider({ children }: { children: ReactNode }) 
       permission = await requestTrackingPermissions();
       setTrackingPermission(permission);
 
-      if (permission === 'granted') {
-        await startLocationTracking();
+      if (permission === 'granted' || permission === 'foreground_only') {
+        permission = await startLocationTracking() ?? permission;
+        setTrackingPermission(permission);
       }
 
       if (permission === 'granted' || permission === 'foreground_only') {

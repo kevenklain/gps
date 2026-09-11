@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -71,7 +72,7 @@ export function HomeScreen() {
   useEffect(() => {
     const interval = setInterval(() => {
       void refresh();
-    }, 10_000);
+    }, 5_000);
 
     return () => clearInterval(interval);
   }, [refresh]);
@@ -117,11 +118,15 @@ export function HomeScreen() {
 
   const permissionWarning =
     trackingPermission === 'foreground_only'
-      ? 'A localização em segundo plano não foi autorizada. Para continuar enviando com a tela fechada, permita acesso à localização o tempo todo nas configurações do aparelho.'
+      ? Platform.OS === 'web'
+        ? 'Localização enviada a cada 5 segundos enquanto esta página estiver ativa. Mantenha a aba aberta; o navegador pode suspender o envio em segundo plano.'
+        : 'Localização enviada a cada 5 segundos com o app aberto. No Expo Go, mantenha esta tela ativa. Para monitorar em segundo plano, use uma build com permissão de localização o tempo todo.'
       : trackingPermission === 'denied'
         ? 'A localização foi negada. O painel não receberá a posição deste aparelho até a permissão ser liberada.'
         : trackingPermission === 'unsupported'
-          ? 'O rastreamento contínuo precisa ser testado em um aparelho Android/iOS com development build ou APK.'
+          ? Platform.OS === 'web'
+            ? 'Localização indisponível. Abra o aplicativo em localhost ou HTTPS e permita o acesso à localização no navegador.'
+            : 'O rastreamento contínuo precisa ser testado em um aparelho Android/iOS com development build ou APK.'
           : null;
 
   return (
@@ -211,7 +216,11 @@ export function HomeScreen() {
         </Pressable>
 
         <Text style={styles.backgroundHint}>
-          O monitoramento continua em segundo plano enquanto a sessão estiver ativa.
+          {Platform.OS === 'web'
+            ? 'O monitoramento usa a localização fornecida pelo seu navegador.'
+            : trackingPermission === 'granted'
+              ? 'O monitoramento continua em segundo plano enquanto a sessão estiver ativa.'
+              : 'Mantenha o aplicativo aberto para transmitir sua localização.'}
         </Text>
       </ScrollView>
 
