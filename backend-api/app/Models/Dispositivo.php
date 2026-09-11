@@ -69,11 +69,11 @@ class Dispositivo extends Model
 
         $segundos = Carbon::parse($this->ultima_comunicacao)->diffInSeconds(now());
 
-        if ($segundos <= 10) {
+        if ($segundos <= 8) {
             return 'online';
         }
 
-        if ($segundos <= 30) {
+        if ($segundos <= 15) {
             return 'sem_comunicacao';
         }
 
