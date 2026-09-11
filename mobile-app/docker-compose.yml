@@ -14,10 +14,9 @@ services:
       - node_modules:/app/node_modules
     environment:
       NODE_ENV: development
-      # Estes enderecos sao definidos automaticamente pelo start-mobile.sh
-      # usando o IP atual do Mac na rede local.
-      EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL}
-      EXPO_PACKAGER_PROXY_URL: ${EXPO_PACKAGER_PROXY_URL}
+      # IP LAN atual do Mac para acesso pelo iPhone fisico.
+      EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL:-http://192.168.1.18:8000}
+      EXPO_PACKAGER_PROXY_URL: ${EXPO_PACKAGER_PROXY_URL:-http://192.168.1.18:8081}
     stdin_open: true
     tty: true
     command: ["npx", "expo", "start", "--lan"]
