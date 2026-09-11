@@ -5,13 +5,13 @@ const state = {
     user: null,
     users: [],
     devices: [],
-    currentPage: 'dashboard',
+    currentPage: 'mapa',
 };
 
 const $ = (id) => document.getElementById(id);
 
 const pageMeta = {
-    dashboard: ['Visão geral', 'Resumo atual da frota'],
+    dashboard: ['Resumo da frota', 'Indicadores e situação atual da frota'],
     mapa: ['Mapa', 'Localização das ambulâncias no mundo'],
     usuarios: ['Usuários', 'CRUD de administradores e funcionários'],
     dispositivos: ['Dispositivos', 'CRUD de tablets e ambulâncias'],
@@ -91,6 +91,7 @@ function logoutLocal() {
     state.user = null;
     state.users = [];
     state.devices = [];
+    state.currentPage = 'mapa';
     localStorage.removeItem('ambulancias_token');
     $('appView').classList.add('hidden');
     $('loginView').classList.remove('hidden');
@@ -100,6 +101,8 @@ function renderSession() {
     const logged = Boolean(state.token && state.user);
     $('loginView').classList.toggle('hidden', logged);
     $('appView').classList.toggle('hidden', !logged);
+
+    document.querySelector('[data-page="dashboard"]')?.replaceChildren(document.createTextNode('Resumo da frota'));
 
     if (!logged) return;
 
@@ -111,7 +114,7 @@ function renderSession() {
     });
 
     if (state.user.tipo !== 'admin' && state.currentPage === 'usuarios') {
-        navigateTo('dashboard');
+        navigateTo('mapa');
     }
 }
 
@@ -121,7 +124,7 @@ async function restoreSession() {
         const data = await api('/me');
         state.user = data.usuario;
         renderSession();
-        await loadPage(state.currentPage);
+        navigateTo(state.currentPage);
     } catch (error) {
         showToast(error.message, 'error');
         logoutLocal();
@@ -138,9 +141,10 @@ async function login(event) {
                 senha: $('loginSenha').value,
             }),
         });
+        state.currentPage = 'mapa';
         setSession(data.token, data.usuario);
         showToast('Login realizado com sucesso.');
-        await loadPage(state.currentPage);
+        navigateTo('mapa');
     } catch (error) {
         showToast(error.message, 'error');
     }
