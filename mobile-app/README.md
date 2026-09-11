@@ -2,6 +2,66 @@
 
 Aplicativo móvel do motorista, adaptado a partir da arquitetura do projeto Expo base e conectado ao projeto Laravel `ambulancias-api`.
 
+## Ambiente de desenvolvimento com Docker
+
+O ambiente Node/npm/Expo pode rodar dentro do Docker enquanto o aplicativo continua sendo executado normalmente fora do container, no celular, emulador ou development build.
+
+Versões fixadas para este projeto:
+
+- Node.js `22.23.1`
+- npm `10.9.8`
+- Expo SDK `57`
+
+Arquivos usados:
+
+- `Dockerfile`: imagem com Node, npm, dependências e suporte ao tunnel do Expo.
+- `docker-compose.yml`: sobe o Metro/Expo e mantém o código montado para hot reload.
+- `.dockerignore`: reduz o contexto enviado ao Docker.
+- `.nvmrc`: registra a mesma versão do Node para quem optar por executar fora do Docker.
+
+### Subir o Expo pelo Docker
+
+Na pasta `mobile-app`:
+
+```bash
+docker compose up --build
+```
+
+O container executa:
+
+```bash
+npx expo start --tunnel
+```
+
+Use o QR code exibido no terminal para abrir o aplicativo no celular. O modo `--tunnel` evita que o aparelho tente acessar diretamente o IP interno do container Docker.
+
+Para encerrar:
+
+```bash
+docker compose down
+```
+
+Para executar novamente sem reconstruir a imagem:
+
+```bash
+docker compose up
+```
+
+Sempre que `package.json` ou `package-lock.json` mudar, reconstrua a imagem:
+
+```bash
+docker compose up --build
+```
+
+Para conferir as versões usadas dentro do container:
+
+```bash
+docker compose run --rm mobile node --version
+docker compose run --rm mobile npm --version
+```
+
+O volume `node_modules` mantém as dependências Linux do container separadas das dependências eventualmente instaladas no computador host.
+
 ## O que o aplicativo faz
 
 - Login com o mesmo funcionário cadastrado no painel web.
@@ -54,7 +114,9 @@ abrindo pelo localhost, acessa a API no localhost; abrindo pelo IP, acessa a API
 Para uma API hospedada ou porta diferente, preencha `EXPO_PUBLIC_WEB_API_URL` com sua URL completa.
 Após alterar o `.env`, reinicie o Expo e recarregue o aplicativo.
 
-## 3. Instalar dependências
+## 3. Instalar dependências sem Docker
+
+Se optar por executar o Expo diretamente no computador:
 
 ```bash
 npm install
@@ -68,7 +130,7 @@ Este projeto usa Expo SDK 57 e adiciona:
 
 Mantenha o `package-lock.json` no projeto. Para reinstalar exatamente as versões validadas, use `npm ci`. Não atualize apenas `expo` ou `expo-router` isoladamente: as bibliotecas nativas precisam acompanhar o SDK. Veja o [guia oficial de atualização do Expo](https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/).
 
-## 4. Testar a interface
+## 4. Testar a interface sem Docker
 
 ```bash
 npm run start
@@ -127,4 +189,3 @@ HomeScreen
   -> stopLocationUpdatesAsync()
   -> apaga token local
 ```
-
