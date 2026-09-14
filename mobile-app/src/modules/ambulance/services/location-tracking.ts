@@ -4,6 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 
 import { sendLocationApi } from './ambulance-api';
 import { BACKGROUND_LOCATION_TASK } from './background-location-task';
+import { getDeviceBatteryPercentage } from './device-battery';
 import { readAuthToken } from './session-storage';
 
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -28,9 +29,9 @@ export async function requestTrackingPermissions(): Promise<TrackingPermissionSt
     if (!await TaskManager.isAvailableAsync()) return 'foreground_only';
     const background = await Location.requestBackgroundPermissionsAsync();
 
-  if (background.status !== 'granted') {
-    return 'foreground_only';
-  }
+    if (background.status !== 'granted') {
+      return 'foreground_only';
+    }
 
     return 'granted';
   } catch {
@@ -103,9 +104,12 @@ async function captureAndSend(currentGeneration: number): Promise<void> {
     return;
   }
 
-  const location = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.High,
-  });
+  const [location, bateria] = await Promise.all([
+    Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    }),
+    getDeviceBatteryPercentage(),
+  ]);
 
   if (generation !== currentGeneration || AppState.currentState !== 'active' ||
       token !== await readAuthToken()) return;
@@ -121,6 +125,7 @@ async function captureAndSend(currentGeneration: number): Promise<void> {
     longitude: location.coords.longitude,
     velocidade: speedInKmPerHour,
     precisao_gps: location.coords.accuracy,
+    bateria,
     registrado_em: new Date(location.timestamp).toISOString(),
   });
 }
