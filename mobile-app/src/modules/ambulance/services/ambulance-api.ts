@@ -123,6 +123,7 @@ export type LocationPayload = {
   longitude: number;
   velocidade?: number | null;
   precisao_gps?: number | null;
+  bateria?: number | null;
   registrado_em?: string;
 };
 
