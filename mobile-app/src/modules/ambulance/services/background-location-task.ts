@@ -3,6 +3,7 @@ import * as TaskManager from 'expo-task-manager';
 
 import { readAuthToken } from './session-storage';
 import { sendLocationApi } from './ambulance-api';
+import { getDeviceBatteryPercentage } from './device-battery';
 
 export const BACKGROUND_LOCATION_TASK = 'ambulancias-background-location';
 
@@ -33,12 +34,14 @@ if (!TaskManager.isTaskDefined(BACKGROUND_LOCATION_TASK)) {
           typeof speedInMetersPerSecond === 'number' && speedInMetersPerSecond >= 0
             ? speedInMetersPerSecond * 3.6
             : null;
+        const bateria = await getDeviceBatteryPercentage();
 
         await sendLocationApi(token, {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           velocidade: speedInKmPerHour,
           precisao_gps: location.coords.accuracy,
+          bateria,
           registrado_em: new Date(location.timestamp).toISOString(),
         });
       } catch {
