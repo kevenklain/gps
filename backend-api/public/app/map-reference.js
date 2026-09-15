@@ -58,6 +58,48 @@
     window.setTimeout(syncMapReference, 360);
   }
 
+  function syncSimulationButton() {
+    const button = $('mapSimulationButton');
+    if (!button) return;
+
+    const running = (button.textContent || '').includes('Parar');
+    button.classList.add('map-simulation-toggle');
+    button.classList.toggle('is-running', running);
+    button.setAttribute('aria-pressed', running ? 'true' : 'false');
+    button.title = running
+      ? 'Parar a simulação da frota'
+      : 'Iniciar uma simulação com a frota de teste em movimento';
+    button.innerHTML = `
+      <span class="material-symbols-rounded" aria-hidden="true">${running ? 'stop_circle' : 'play_circle'}</span>
+      <span>${running ? 'Parar simulação' : 'Simular frota'}</span>`;
+
+    const status = $('mapSimulationStatus');
+    if (status) {
+      status.textContent = running
+        ? 'Simulação ativa: os veículos de teste recebem novas posições a cada 5 segundos.'
+        : 'Simulação desligada. As posições exibidas vêm normalmente dos dispositivos.';
+    }
+  }
+
+  function mountSimulationButton() {
+    const button = $('mapSimulationButton');
+    const actions = document.querySelector('#mapPanel .map-reference-actions');
+    if (!button || !actions) return;
+
+    if (button.parentElement !== actions) actions.appendChild(button);
+    button.removeAttribute('aria-hidden');
+    syncSimulationButton();
+
+    if (button.dataset.simulationUiBound !== '1') {
+      button.dataset.simulationUiBound = '1';
+      button.addEventListener('click', () => {
+        // O app-core executa a chamada real da API. Este listener cuida apenas
+        // do estado visual depois que o handler principal altera o texto.
+        window.setTimeout(syncSimulationButton, 0);
+      });
+    }
+  }
+
   function renderFleetList(buttons) {
     const panel = $('mapDeviceDetails');
     if (!panel) return;
@@ -144,6 +186,7 @@
     }
 
     updateMarkerIcons();
+    syncSimulationButton();
     renderFleetList(buttons);
   }
 
@@ -156,6 +199,8 @@
   function init() {
     const mapPage = $('mapaPage');
     if (!mapPage) return;
+
+    mountSimulationButton();
 
     $('mapRefreshButton')?.addEventListener('click', () => {
       $('refreshButton')?.click();
