@@ -16,37 +16,14 @@
         'login-fonts'
     );
 
-    const ambulanceLogo = `
-        <svg viewBox="0 0 84 70" aria-hidden="true" focusable="false">
-            <g fill="none" stroke="#153a69" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 27h48c4.4 0 8 3.6 8 8v19H7V35c0-4.4 1.6-8 5-8z" fill="#fff"/>
-                <path d="M18 16h31c4 0 6 2 6 6v5H14v-6c0-3.2 1.4-5 4-5z" fill="#fff"/>
-                <path d="M14 27v14H7l6-14z" fill="#dff1ff"/>
-                <path d="M20 27h18v14H20z" fill="#dff1ff"/>
-                <path d="M40 27h14v14H40z" fill="#dff1ff"/>
-                <path d="M7 43h61" stroke="#ef4e5b" stroke-width="5.2"/>
-                <path d="M35 25v17M27 33.5h16" stroke="#1677ef" stroke-width="5.4"/>
-                <path d="M23 11h8v5h-8zM42 11h8v5h-8z" fill="#ef4e5b" stroke="#153a69"/>
-                <path d="M61 34h7v9h-7" fill="#dff1ff"/>
-                <circle cx="20" cy="55" r="8" fill="#fff"/>
-                <circle cx="20" cy="55" r="3.7" fill="#153a69" stroke="none"/>
-                <circle cx="53" cy="55" r="8" fill="#fff"/>
-                <circle cx="53" cy="55" r="3.7" fill="#153a69" stroke="none"/>
-            </g>
-        </svg>`;
-
     loginView.innerHTML = `
         <div class="login-map-art" aria-hidden="true">
             <span class="login-map-pin material-symbols-rounded">location_on</span>
         </div>
 
         <section class="login-reference-card" aria-labelledby="loginTitle">
-            <div class="login-reference-brand">
-                <span class="login-reference-logo">${ambulanceLogo}</span>
-                <div class="login-reference-brand-copy">
-                    <strong>Ambulâncias</strong>
-                    <span>MVP</span>
-                </div>
+            <div class="login-reference-brand login-reference-brand-localiza">
+                <img class="login-localizafrota-logo" src="./localizafrota-logo.png?v=20260915" alt="LocalizaFrota">
             </div>
 
             <header class="login-reference-header">
