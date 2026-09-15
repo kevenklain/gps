@@ -2,6 +2,9 @@
   const $ = (id) => document.getElementById(id);
   let syncTimer = null;
   let fleetListScrollTop = 0;
+  let smartFilterDevices = [];
+  let smartFilterLoadedAt = 0;
+  let smartFilterLoading = null;
 
   const escapeHtml = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -9,6 +12,12 @@
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+
+  const normalizeSearch = (value) => String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
   const statusKeyFromText = (text) => {
     if (text.includes('Sem comunicação')) return 'sem_comunicacao';
@@ -45,9 +54,203 @@
     });
   }
 
+  function closeSmartFilter() {
+    const filter = $('mapSmartFilter');
+    const input = $('mapSmartSearch');
+    if (!filter) return;
+    filter.classList.remove('is-open');
+    input?.setAttribute('aria-expanded', 'false');
+  }
+
+  async function loadSmartFilterDevices(force = false) {
+    const now = Date.now();
+    if (!force && smartFilterDevices.length && now - smartFilterLoadedAt < 30000) {
+      return smartFilterDevices;
+    }
+    if (smartFilterLoading) return smartFilterLoading;
+
+    const token = localStorage.getItem('ambulancias_token') || '';
+    if (!token) return smartFilterDevices;
+
+    smartFilterLoading = fetch('/api/dispositivos', {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Não foi possível carregar os veículos do filtro.');
+        const data = await response.json();
+        smartFilterDevices = Array.isArray(data.dados) ? data.dados : [];
+        smartFilterLoadedAt = Date.now();
+        return smartFilterDevices;
+      })
+      .finally(() => {
+        smartFilterLoading = null;
+      });
+
+    return smartFilterLoading;
+  }
+
+  function renderSmartFilterResults() {
+    const dropdown = $('mapSmartFilterDropdown');
+    const input = $('mapSmartSearch');
+    if (!dropdown || !input) return;
+
+    const term = normalizeSearch(input.value);
+    const select = $('mapDeviceFilter');
+    const selected = select?.value || 'all';
+
+    const filtered = smartFilterDevices.filter((device) => {
+      if (!term) return true;
+      const haystack = normalizeSearch([
+        device.nome,
+        device.placa,
+        device.modelo_veiculo,
+        device.usuario?.nome,
+      ].filter(Boolean).join(' '));
+      return haystack.includes(term);
+    });
+
+    const allOption = `
+      <button class="map-smart-option all ${selected === 'all' ? 'is-selected' : ''}" type="button" data-smart-device-id="all" role="option" aria-selected="${selected === 'all'}">
+        <span class="map-smart-option-icon"><span class="material-symbols-rounded" aria-hidden="true">directions_car</span></span>
+        <span class="map-smart-option-copy">
+          <strong>Todos os veículos</strong>
+          <small>Mostrar todos os ${smartFilterDevices.length} veículos da frota no mapa</small>
+        </span>
+        <span class="map-smart-option-chevron material-symbols-rounded" aria-hidden="true">chevron_right</span>
+      </button>`;
+
+    const rows = filtered.map((device) => {
+      const responsible = device.usuario?.nome || 'Sem responsável';
+      const plate = device.placa || 'Sem placa';
+      const isSelected = String(device.id) === String(selected);
+      return `
+        <button class="map-smart-option ${isSelected ? 'is-selected' : ''}" type="button" data-smart-device-id="${escapeHtml(device.id)}" role="option" aria-selected="${isSelected}">
+          <span class="map-smart-option-icon"><span class="material-symbols-rounded" aria-hidden="true">ambulance</span></span>
+          <span class="map-smart-option-copy">
+            <strong>${escapeHtml(device.nome || 'Veículo')}</strong>
+            <small>${escapeHtml(plate)} &nbsp;•&nbsp; ${escapeHtml(responsible)}</small>
+          </span>
+          <span class="map-smart-option-chevron material-symbols-rounded" aria-hidden="true">chevron_right</span>
+        </button>`;
+    }).join('');
+
+    dropdown.innerHTML = allOption + (rows || '<div class="map-smart-filter-state">Nenhum veículo encontrado.</div>');
+
+    dropdown.querySelectorAll('[data-smart-device-id]').forEach((option) => {
+      option.addEventListener('click', () => {
+        const id = option.dataset.smartDeviceId;
+        if (id === 'all') {
+          input.value = '';
+          showAllVehicles();
+          closeSmartFilter();
+          return;
+        }
+
+        const device = smartFilterDevices.find((item) => String(item.id) === String(id));
+        if (device) input.value = device.nome || '';
+
+        if (select) {
+          select.value = String(id);
+          select.dispatchEvent(new Event('change', {bubbles: true}));
+        }
+        closeSmartFilter();
+      });
+    });
+  }
+
+  async function openSmartFilter() {
+    const filter = $('mapSmartFilter');
+    const input = $('mapSmartSearch');
+    const dropdown = $('mapSmartFilterDropdown');
+    if (!filter || !input || !dropdown) return;
+
+    filter.classList.add('is-open');
+    input.setAttribute('aria-expanded', 'true');
+
+    if (!smartFilterDevices.length || Date.now() - smartFilterLoadedAt > 30000) {
+      dropdown.innerHTML = '<div class="map-smart-filter-state">Carregando veículos...</div>';
+      try {
+        await loadSmartFilterDevices();
+      } catch (error) {
+        dropdown.innerHTML = `<div class="map-smart-filter-state">${escapeHtml(error.message)}</div>`;
+        return;
+      }
+    }
+
+    renderSmartFilterResults();
+  }
+
+  function syncSmartFilterSelection() {
+    const input = $('mapSmartSearch');
+    const filter = $('mapSmartFilter');
+    const select = $('mapDeviceFilter');
+    if (!input || !filter || !select) return;
+    if (filter.classList.contains('is-open') || document.activeElement === input) return;
+
+    if (select.value === 'all') {
+      input.value = '';
+      return;
+    }
+
+    const selectedDevice = smartFilterDevices.find((device) => String(device.id) === String(select.value));
+    if (selectedDevice) input.value = selectedDevice.nome || '';
+  }
+
+  function mountSmartFilter() {
+    const tools = document.querySelector('#mapPanel .map-reference-tools');
+    if (!tools || $('mapSmartFilter')) return;
+
+    const filter = document.createElement('div');
+    filter.id = 'mapSmartFilter';
+    filter.className = 'map-smart-filter';
+    filter.innerHTML = `
+      <div class="map-smart-filter-control">
+        <span class="map-smart-filter-search-icon material-symbols-rounded" aria-hidden="true">search</span>
+        <input id="mapSmartSearch" type="search" placeholder="Buscar por veículo, placa ou motorista..." autocomplete="off" aria-autocomplete="list" aria-controls="mapSmartFilterDropdown" aria-expanded="false">
+        <button id="mapSmartFilterToggle" class="map-smart-filter-toggle" type="button" aria-label="Abrir lista de veículos">
+          <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+        </button>
+      </div>
+      <div id="mapSmartFilterDropdown" class="map-smart-filter-dropdown" role="listbox"></div>`;
+
+    tools.appendChild(filter);
+
+    const input = $('mapSmartSearch');
+    input?.addEventListener('focus', openSmartFilter);
+    input?.addEventListener('click', openSmartFilter);
+    input?.addEventListener('input', () => {
+      if (!filter.classList.contains('is-open')) openSmartFilter();
+      else renderSmartFilterResults();
+    });
+    input?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeSmartFilter();
+        input.blur();
+      }
+    });
+
+    $('mapSmartFilterToggle')?.addEventListener('click', async () => {
+      if (filter.classList.contains('is-open')) closeSmartFilter();
+      else {
+        await openSmartFilter();
+        input?.focus();
+      }
+    });
+
+    document.addEventListener('pointerdown', (event) => {
+      if (!filter.contains(event.target)) closeSmartFilter();
+    });
+  }
+
   function showAllVehicles() {
     const select = $('mapDeviceFilter');
     if (select) select.value = 'all';
+
+    const input = $('mapSmartSearch');
+    if (input && document.activeElement !== input) input.value = '';
 
     const fitButton = $('mapFitButton');
     if (fitButton) {
@@ -94,8 +297,6 @@
     if (button.dataset.simulationUiBound !== '1') {
       button.dataset.simulationUiBound = '1';
       button.addEventListener('click', () => {
-        // O app-core executa a chamada real da API. Este listener cuida apenas
-        // do estado visual depois que o handler principal altera o texto.
         window.setTimeout(syncSimulationButton, 0);
       });
     }
@@ -105,9 +306,6 @@
     const panel = $('mapDeviceDetails');
     if (!panel) return;
 
-    // A lista e reconstruida para refletir status/veiculos atualizados a cada ciclo.
-    // Guardamos a rolagem antes disso para que o polling nao jogue o usuario
-    // novamente para o primeiro item enquanto ele procura um veiculo no fim da lista.
     const previousBody = panel.querySelector('.map-fleet-list-body');
     if (previousBody) fleetListScrollTop = previousBody.scrollTop;
 
@@ -162,7 +360,6 @@
 
     const body = panel.querySelector('.map-fleet-list-body');
     if (body) {
-      // Limita ao novo maximo caso a quantidade de veiculos tenha diminuido.
       const maxScroll = Math.max(0, body.scrollHeight - body.clientHeight);
       body.scrollTop = Math.min(fleetListScrollTop, maxScroll);
       body.addEventListener('scroll', () => {
@@ -170,7 +367,6 @@
       }, {passive: true});
     }
 
-    // Se o usuario estava navegando com teclado, restaura o foco sem alterar a rolagem.
     if (focusedIndex !== null) {
       const focusedRow = panel.querySelector(`[data-map-device-index="${focusedIndex}"]`);
       focusedRow?.focus({preventScroll: true});
@@ -213,6 +409,7 @@
     updateMarkerIcons();
     syncSimulationButton();
     renderFleetList(buttons);
+    syncSmartFilterSelection();
   }
 
   function scheduleSync() {
@@ -226,9 +423,11 @@
     if (!mapPage) return;
 
     mountSimulationButton();
+    mountSmartFilter();
 
     $('mapRefreshButton')?.addEventListener('click', () => {
       $('refreshButton')?.click();
+      smartFilterLoadedAt = 0;
       window.setTimeout(syncMapReference, 350);
     });
 
@@ -238,7 +437,10 @@
       button.addEventListener('click', () => document.body.classList.remove('map-sidebar-open'));
     });
 
-    $('mapDeviceFilter')?.addEventListener('change', () => window.setTimeout(syncMapReference, 260));
+    $('mapDeviceFilter')?.addEventListener('change', () => window.setTimeout(() => {
+      syncMapReference();
+      syncSmartFilterSelection();
+    }, 260));
 
     scheduleSync();
     window.addEventListener('beforeunload', () => window.clearTimeout(syncTimer), {once: true});
