@@ -106,12 +106,26 @@ class DispositivoController extends Controller
 
     public function destroy(Dispositivo $dispositivo): JsonResponse
     {
-        // Nao apagamos o historico GPS no MVP.
+        // Desativar preserva o cadastro e o historico GPS.
         $dispositivo->update(['ativo' => false, 'token' => null]);
 
         return response()->json([
             'sucesso' => true,
             'mensagem' => 'Dispositivo desativado. O historico foi preservado.',
+        ]);
+    }
+
+    public function excluir(Dispositivo $dispositivo): JsonResponse
+    {
+        $nome = $dispositivo->nome;
+
+        // A FK de localizacoes usa cascadeOnDelete, portanto a exclusao permanente
+        // remove tambem o historico GPS associado ao dispositivo.
+        $dispositivo->delete();
+
+        return response()->json([
+            'sucesso' => true,
+            'mensagem' => "Veiculo \"{$nome}\" excluido permanentemente.",
         ]);
     }
 
