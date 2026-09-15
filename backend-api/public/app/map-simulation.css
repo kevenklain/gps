@@ -1,0 +1,83 @@
+#mapPanel #mapSimulationButton.map-simulation-toggle {
+  height: 62px;
+  min-width: 154px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 18px;
+  border: 1px solid #bed6f3;
+  border-radius: 9px;
+  color: #0f5fb7;
+  background: #eef6ff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(22, 89, 160, .06);
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+#mapPanel #mapSimulationButton.map-simulation-toggle:hover {
+  border-color: #8ebbf0;
+  background: #e5f1ff;
+}
+
+#mapPanel #mapSimulationButton.map-simulation-toggle:active {
+  transform: translateY(1px);
+}
+
+#mapPanel #mapSimulationButton.map-simulation-toggle .material-symbols-rounded {
+  font-size: 23px;
+  line-height: 1;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+#mapPanel #mapSimulationButton.map-simulation-toggle.is-running {
+  border-color: #f1b7bc;
+  color: #b4232f;
+  background: #fff0f1;
+  box-shadow: 0 4px 12px rgba(181, 35, 47, .07);
+}
+
+#mapPanel #mapSimulationButton.map-simulation-toggle.is-running:hover {
+  border-color: #eb929a;
+  background: #ffe7e9;
+}
+
+#mapPanel #mapSimulationButton.map-simulation-toggle.hidden {
+  display: none !important;
+}
+
+@media (max-width: 1380px) {
+  #mapPanel .map-last-update {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1040px) {
+  #mapPanel #mapSimulationButton.map-simulation-toggle,
+  #mapPanel #mapRefreshButton {
+    min-width: 54px;
+    width: 54px;
+    padding: 0;
+  }
+
+  #mapPanel #mapSimulationButton.map-simulation-toggle > span:last-child,
+  #mapPanel #mapRefreshButton > span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  #mapPanel .map-reference-actions {
+    gap: 7px;
+  }
+
+  #mapPanel #mapSimulationButton.map-simulation-toggle,
+  #mapPanel #mapRefreshButton {
+    height: 50px;
+    min-width: 50px;
+    width: 50px;
+  }
+}
