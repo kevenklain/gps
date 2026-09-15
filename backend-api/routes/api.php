@@ -61,6 +61,7 @@ Route::middleware('usuario.token')->group(function () {
         Route::post('/dispositivos', [DispositivoController::class, 'store']);
         Route::put('/dispositivos/{dispositivo}', [DispositivoController::class, 'update']);
         Route::delete('/dispositivos/{dispositivo}', [DispositivoController::class, 'destroy']);
+        Route::delete('/dispositivos/{dispositivo}/excluir', [DispositivoController::class, 'excluir']);
         Route::post('/dispositivos/{dispositivo}/gerar-token', [DispositivoController::class, 'gerarToken']);
     });
 });
