@@ -1,0 +1,237 @@
+/* Filtro híbrido de busca + seleção do Mapa da Frota. */
+#mapPanel .map-reference-tools {
+  position: relative;
+  z-index: 850;
+  display: grid !important;
+  grid-template-columns: minmax(520px, 575px) minmax(420px, 1fr);
+  align-items: stretch;
+  gap: 22px;
+}
+
+#mapPanel .map-status-grid {
+  width: 100%;
+}
+
+#mapPanel .map-smart-filter {
+  position: relative;
+  min-width: 0;
+  align-self: stretch;
+}
+
+#mapPanel .map-smart-filter-control {
+  width: 100%;
+  height: 100%;
+  min-height: 70px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 1px solid #a8c9f7;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(28, 68, 111, .035);
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+#mapPanel .map-smart-filter.is-open .map-smart-filter-control,
+#mapPanel .map-smart-filter-control:focus-within {
+  border-color: #5f9df0;
+  box-shadow: 0 0 0 3px rgba(29, 117, 235, .08);
+}
+
+#mapPanel .map-smart-filter-search-icon {
+  color: #496989;
+  font-size: 25px;
+}
+
+#mapPanel #mapSmartSearch {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #183857;
+  background: transparent;
+  font: 500 15px/1.2 'Inter', sans-serif;
+}
+
+#mapPanel #mapSmartSearch::placeholder {
+  color: #6c84a3;
+  opacity: 1;
+}
+
+#mapPanel .map-smart-filter-toggle {
+  width: 28px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: #1870d8;
+  background: transparent;
+  cursor: pointer;
+}
+
+#mapPanel .map-smart-filter-toggle .material-symbols-rounded {
+  font-size: 24px;
+  transition: transform .16s ease;
+}
+
+#mapPanel .map-smart-filter.is-open .map-smart-filter-toggle .material-symbols-rounded {
+  transform: rotate(180deg);
+}
+
+#mapPanel .map-smart-filter-dropdown {
+  position: absolute;
+  z-index: 1400;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  display: none;
+  max-height: min(390px, 48vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 9px;
+  border: 1px solid #d5e1ee;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .99);
+  box-shadow: 0 18px 42px rgba(25, 55, 89, .16);
+  scrollbar-width: thin;
+  scrollbar-color: #bfd0e1 transparent;
+}
+
+#mapPanel .map-smart-filter.is-open .map-smart-filter-dropdown {
+  display: block;
+}
+
+#mapPanel .map-smart-option {
+  width: 100%;
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 26px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 9px;
+  color: #163653;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s ease;
+}
+
+#mapPanel .map-smart-option:hover,
+#mapPanel .map-smart-option:focus-visible,
+#mapPanel .map-smart-option.is-selected {
+  outline: 0;
+  background: #eef6ff;
+}
+
+#mapPanel .map-smart-option-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #139b5e;
+  background: #e6f7ee;
+}
+
+#mapPanel .map-smart-option.all .map-smart-option-icon {
+  color: #1675e9;
+  background: #e4f0ff;
+}
+
+#mapPanel .map-smart-option-icon .material-symbols-rounded {
+  font-size: 27px;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 32;
+}
+
+#mapPanel .map-smart-option-copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+#mapPanel .map-smart-option-copy strong {
+  overflow: hidden;
+  color: #173755;
+  font-size: 14px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#mapPanel .map-smart-option-copy small {
+  overflow: hidden;
+  color: #6680a1;
+  font-size: 12px;
+  line-height: 1.15;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#mapPanel .map-smart-option-chevron {
+  justify-self: end;
+  color: #416987;
+  font-size: 22px;
+}
+
+#mapPanel .map-smart-filter-state {
+  padding: 22px 18px;
+  color: #657e9c;
+  font-size: 13px;
+  text-align: center;
+}
+
+#mapPanel .map-reference-map-card {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1380px) {
+  #mapPanel .map-reference-tools {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  #mapPanel .map-status-grid {
+    width: min(575px, 100%);
+  }
+
+  #mapPanel .map-smart-filter-control {
+    min-height: 58px;
+  }
+}
+
+@media (max-width: 720px) {
+  #mapPanel .map-reference-tools {
+    gap: 12px;
+  }
+
+  #mapPanel .map-smart-filter-control {
+    min-height: 54px;
+    padding: 0 13px;
+    grid-template-columns: 26px minmax(0, 1fr) 24px;
+  }
+
+  #mapPanel #mapSmartSearch {
+    font-size: 13px;
+  }
+
+  #mapPanel .map-smart-filter-dropdown {
+    position: fixed;
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-height: 58svh;
+    border-radius: 16px;
+    box-shadow: 0 -12px 36px rgba(20, 48, 79, .18);
+  }
+}
