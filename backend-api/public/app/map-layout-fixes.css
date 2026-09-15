@@ -1,0 +1,258 @@
+/* Ajustes responsivos da tela Mapa da Frota.
+   Mantém o layout de referência em telas largas e evita overflow em notebooks. */
+
+#mapPanel,
+#mapPanel *,
+#appView .sidebar,
+#appView .sidebar * {
+  box-sizing: border-box;
+}
+
+#mapPanel .map-reference-header,
+#mapPanel .map-reference-tools,
+#mapPanel .map-status-grid,
+#mapPanel .map-search-filter,
+#mapPanel .map-reference-map-card,
+#mapPanel .map-reference-stage {
+  width: 100%;
+  min-width: 0;
+}
+
+#mapPanel .map-reference-header {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) auto;
+  align-items: start;
+}
+
+#mapPanel .map-reference-title-wrap,
+#mapPanel .map-reference-title-copy,
+#mapPanel .map-reference-actions,
+#mapPanel .map-status-card,
+#mapPanel .map-status-copy,
+#mapPanel .map-search-box {
+  min-width: 0;
+}
+
+#mapPanel .map-reference-actions {
+  flex-wrap: nowrap;
+  max-width: 100%;
+}
+
+#mapPanel .map-reference-tools {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  gap: 14px;
+}
+
+#mapPanel .map-status-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+#mapPanel .map-status-card {
+  padding-left: 12px;
+  padding-right: 12px;
+  gap: 10px;
+  overflow: hidden;
+}
+
+#mapPanel .map-status-dot {
+  width: 19px;
+  height: 19px;
+  flex-basis: 19px;
+}
+
+#mapPanel .map-status-copy strong {
+  font-size: 19px;
+}
+
+#mapPanel .map-status-copy span {
+  min-width: 0;
+  font-size: 10px;
+  white-space: normal;
+  line-height: 1.15;
+}
+
+#mapPanel .map-search-filter {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 40%);
+  gap: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#mapPanel #mapSearch,
+#mapPanel #mapDeviceFilter {
+  min-width: 0;
+}
+
+#mapPanel #mapSearch {
+  text-overflow: ellipsis;
+}
+
+#mapPanel .map-reference-map-card {
+  max-width: 100%;
+}
+
+/* Ícone do produto no menu: ambulância mais próxima da referência visual. */
+#appView .sidebar-brand .brand-mark::before {
+  content: '';
+  width: 43px;
+  height: 39px;
+  display: block;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 84 70'%3E%3Cg fill='none' stroke='%23eef7ff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 27h48c4.4 0 8 3.6 8 8v19H7V35c0-4.4 1.6-8 5-8z'/%3E%3Cpath d='M18 16h31c4 0 6 2 6 6v5H14v-6c0-3.2 1.4-5 4-5z'/%3E%3Cpath d='M14 27v14H7l6-14z' fill='%239fd6ff'/%3E%3Cpath d='M20 27h18v14H20zM40 27h14v14H40z' fill='%239fd6ff'/%3E%3Cpath d='M7 43h61' stroke='%23ff5d6c' stroke-width='5.2'/%3E%3Cpath d='M35 25v17M27 33.5h16' stroke='%2345a0ff' stroke-width='5.4'/%3E%3Ccircle cx='20' cy='55' r='8'/%3E%3Ccircle cx='53' cy='55' r='8'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+#appView .nav-item[data-page='dispositivos']::before {
+  content: 'directions_car';
+}
+
+/* Notebook / desktop compacto: na referência original há espaço horizontal maior.
+   Abaixo de 1380 px, busca e filtros passam para uma segunda linha para nunca
+   invadir a lateral direita. */
+@media (max-width: 1380px) and (min-width: 981px) {
+  #mapPanel.map-panel {
+    padding: 26px 28px 22px;
+  }
+
+  #mapPanel .map-reference-header {
+    grid-template-columns: minmax(300px, 1fr) auto;
+    gap: 18px;
+    padding-bottom: 18px;
+  }
+
+  #mapPanel .map-reference-actions {
+    gap: 8px;
+  }
+
+  #mapPanel .map-last-update {
+    min-width: 188px;
+    width: 188px;
+    padding: 0 13px;
+  }
+
+  #mapPanel .map-reference-action-button {
+    min-width: 126px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #mapPanel .map-reference-tools {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  #mapPanel .map-status-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #mapPanel .map-status-card {
+    min-height: 66px;
+    padding: 9px 15px;
+    gap: 12px;
+  }
+
+  #mapPanel .map-status-dot {
+    width: 20px;
+    height: 20px;
+    flex-basis: 20px;
+  }
+
+  #mapPanel .map-status-copy strong {
+    font-size: 19px;
+  }
+
+  #mapPanel .map-status-copy span {
+    font-size: 10.5px;
+    white-space: nowrap;
+  }
+
+  #mapPanel .map-search-filter {
+    min-height: 66px;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 31%);
+    gap: 12px;
+    padding: 8px 10px;
+  }
+
+  #mapPanel #fleetMap {
+    height: clamp(430px, calc(100svh - 405px), 570px) !important;
+    min-height: 430px !important;
+  }
+
+  #mapPanel .map-reference-stage {
+    min-height: 430px;
+  }
+}
+
+@media (max-width: 1180px) and (min-width: 981px) {
+  #mapPanel .map-reference-header {
+    grid-template-columns: 1fr;
+  }
+
+  #mapPanel .map-reference-actions {
+    justify-content: flex-end;
+  }
+
+  #mapPanel .map-reference-title-copy p {
+    max-width: 620px;
+  }
+
+  #mapPanel #fleetMap {
+    height: clamp(420px, calc(100svh - 455px), 535px) !important;
+    min-height: 420px !important;
+  }
+
+  #mapPanel .map-reference-stage {
+    min-height: 420px;
+  }
+}
+
+/* Tablet: sidebar vira drawer e a página passa a usar toda a largura. */
+@media (max-width: 980px) {
+  #mapPanel .map-reference-header {
+    display: flex;
+    width: 100%;
+  }
+
+  #mapPanel .map-reference-tools {
+    grid-template-columns: 1fr;
+  }
+
+  #mapPanel .map-search-filter {
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 35%);
+  }
+}
+
+@media (max-width: 720px) {
+  #mapPanel .map-search-filter {
+    grid-template-columns: 1fr;
+  }
+
+  #mapPanel .map-status-copy span {
+    white-space: normal;
+  }
+}
+
+/* Ultrawide: limita a expansão dos controles e entrega o ganho de largura ao mapa. */
+@media (min-width: 1900px) {
+  #mapPanel.map-panel {
+    padding-left: clamp(30px, 2.2vw, 48px);
+    padding-right: clamp(30px, 2.2vw, 48px);
+  }
+
+  #mapPanel .map-reference-tools {
+    grid-template-columns: minmax(620px, .82fr) minmax(600px, 1.18fr);
+    gap: 20px;
+  }
+
+  #mapPanel .map-search-filter {
+    grid-template-columns: minmax(320px, 1fr) 280px;
+  }
+
+  #mapPanel #fleetMap {
+    height: clamp(590px, calc(100svh - 350px), 820px) !important;
+  }
+}
