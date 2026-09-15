@@ -23,7 +23,7 @@
 
         <section class="login-reference-card" aria-labelledby="loginTitle">
             <div class="login-reference-brand login-reference-brand-localiza">
-                <img class="login-localizafrota-logo" src="./localizafrota-logo.png?v=20260915" alt="LocalizaFrota">
+                <img class="login-localizafrota-logo" src="./localizafrota-logo.png?v=20260915-2" alt="LocalizaFrota">
             </div>
 
             <header class="login-reference-header">
