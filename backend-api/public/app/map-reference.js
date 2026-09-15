@@ -1,6 +1,7 @@
 (() => {
   const $ = (id) => document.getElementById(id);
   let syncTimer = null;
+  let fleetListScrollTop = 0;
 
   const escapeHtml = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -104,6 +105,14 @@
     const panel = $('mapDeviceDetails');
     if (!panel) return;
 
+    // A lista e reconstruida para refletir status/veiculos atualizados a cada ciclo.
+    // Guardamos a rolagem antes disso para que o polling nao jogue o usuario
+    // novamente para o primeiro item enquanto ele procura um veiculo no fim da lista.
+    const previousBody = panel.querySelector('.map-fleet-list-body');
+    if (previousBody) fleetListScrollTop = previousBody.scrollTop;
+
+    const focusedIndex = document.activeElement?.dataset?.mapDeviceIndex ?? null;
+
     panel.className = 'map-fleet-list';
     const select = $('mapDeviceFilter');
     const selectedIndex = select && select.value !== 'all' ? Math.max(0, select.selectedIndex - 1) : -1;
@@ -150,6 +159,22 @@
       <div class="map-fleet-list-body">
         ${rows || '<div class="map-fleet-empty">Nenhum veículo disponível.</div>'}
       </div>`;
+
+    const body = panel.querySelector('.map-fleet-list-body');
+    if (body) {
+      // Limita ao novo maximo caso a quantidade de veiculos tenha diminuido.
+      const maxScroll = Math.max(0, body.scrollHeight - body.clientHeight);
+      body.scrollTop = Math.min(fleetListScrollTop, maxScroll);
+      body.addEventListener('scroll', () => {
+        fleetListScrollTop = body.scrollTop;
+      }, {passive: true});
+    }
+
+    // Se o usuario estava navegando com teclado, restaura o foco sem alterar a rolagem.
+    if (focusedIndex !== null) {
+      const focusedRow = panel.querySelector(`[data-map-device-index="${focusedIndex}"]`);
+      focusedRow?.focus({preventScroll: true});
+    }
 
     $('mapShowAllVehicles')?.addEventListener('click', showAllVehicles);
 
