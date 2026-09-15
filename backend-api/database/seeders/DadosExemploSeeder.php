@@ -54,7 +54,7 @@ class DadosExemploSeeder extends Seeder
             &$usuariosAtualizados,
             &$dispositivosCriados,
             &$dispositivosAtualizados,
-            &$localizacoesCriadas,
+            &$localizacoesCriadas
         ) {
             for ($indice = 0; $indice < self::TOTAL; $indice++) {
                 $sequencia = $indice + 1;
