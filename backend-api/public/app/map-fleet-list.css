@@ -1,0 +1,377 @@
+/* Mapa da Frota — composição fiel à referência com lista lateral de veículos. */
+#mapPanel.map-panel {
+  padding: 28px 28px 24px !important;
+}
+
+#mapPanel .map-reference-header {
+  min-height: 78px;
+  padding-bottom: 19px;
+  align-items: flex-start;
+}
+
+#mapPanel .map-reference-header h1 {
+  font-size: clamp(34px, 2.45vw, 41px);
+  line-height: 1.05;
+}
+
+#mapPanel .map-reference-header p {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+#mapPanel .map-reference-actions {
+  gap: 14px;
+}
+
+#mapPanel #mapFilterButton {
+  display: none !important;
+}
+
+#mapPanel .map-last-update {
+  min-width: 206px;
+  height: 62px;
+  padding: 0 18px;
+  border-radius: 11px;
+}
+
+#mapPanel #mapRefreshButton {
+  min-width: 164px;
+  height: 62px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+#mapPanel .map-reference-tools {
+  display: block !important;
+  margin-bottom: 20px;
+}
+
+#mapPanel .map-status-grid {
+  width: min(575px, 100%);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+}
+
+#mapPanel .map-status-card {
+  min-width: 0;
+  min-height: 70px;
+  padding: 11px 15px;
+  gap: 13px;
+}
+
+#mapPanel .map-status-copy strong {
+  font-size: 20px;
+}
+
+#mapPanel .map-status-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A referência nova não exibe busca/filtro nessa tela. O select permanece no DOM
+   porque a lógica existente usa o campo para focar um veículo ao clicar na lista. */
+#mapPanel .map-search-filter {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+#mapPanel .map-reference-map-card {
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+#mapPanel .map-reference-stage {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) clamp(330px, 25vw, 405px);
+  min-height: 604px !important;
+  background: #fff;
+}
+
+#mapPanel #fleetMap {
+  grid-column: 1;
+  width: 100%;
+  height: 604px !important;
+  min-height: 604px !important;
+}
+
+/* Lista lateral direita */
+#mapPanel #mapDeviceDetails.map-fleet-list {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 2 !important;
+  width: auto !important;
+  min-width: 0;
+  height: 604px;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-left: 1px solid #dce6f1 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+#mapPanel .map-fleet-list-header {
+  flex: 0 0 auto;
+  padding: 24px 22px 15px;
+  border-bottom: 1px solid #dce6f1;
+}
+
+#mapPanel .map-fleet-list-header strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #122f50;
+  font-size: 21px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+#mapPanel .map-fleet-list-header span {
+  display: block;
+  color: #60799c;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+#mapPanel .map-fleet-list-body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c9d7e6 transparent;
+}
+
+#mapPanel .map-fleet-row {
+  width: 100%;
+  min-height: 67px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) minmax(108px, auto) 23px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 15px 9px 20px;
+  border: 0;
+  border-bottom: 1px solid #e2e9f0;
+  color: #18334f;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .14s ease;
+}
+
+#mapPanel .map-fleet-row:hover,
+#mapPanel .map-fleet-row.is-selected {
+  background: #f6f9fd;
+}
+
+#mapPanel .map-fleet-row:disabled {
+  cursor: default;
+  opacity: .72;
+}
+
+#mapPanel .map-fleet-vehicle-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+#mapPanel .map-fleet-vehicle-icon .material-symbols-rounded {
+  font-size: 28px;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 32;
+}
+
+#mapPanel .map-fleet-row.online .map-fleet-vehicle-icon { color: #149657; background: #e5f7ed; }
+#mapPanel .map-fleet-row.sem_comunicacao .map-fleet-vehicle-icon { color: #e2a20b; background: #fff4d7; }
+#mapPanel .map-fleet-row.offline .map-fleet-vehicle-icon { color: #df2e3f; background: #ffe9ec; }
+#mapPanel .map-fleet-row.inativo .map-fleet-vehicle-icon { color: #7f8fa4; background: #edf1f5; }
+
+#mapPanel .map-fleet-vehicle-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+#mapPanel .map-fleet-vehicle-copy strong {
+  overflow: hidden;
+  color: #17324f;
+  font-size: 14px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#mapPanel .map-fleet-vehicle-copy small {
+  overflow: hidden;
+  color: #5f789b;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#mapPanel .map-fleet-status {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  color: #58718f;
+  font-size: 12px;
+  line-height: 1.15;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+#mapPanel .map-fleet-status-dot {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  border-radius: 50%;
+}
+
+#mapPanel .map-fleet-row.online .map-fleet-status-dot { background: var(--map-online); }
+#mapPanel .map-fleet-row.sem_comunicacao .map-fleet-status-dot { background: var(--map-warning); }
+#mapPanel .map-fleet-row.offline .map-fleet-status-dot { background: var(--map-offline); }
+#mapPanel .map-fleet-row.inativo .map-fleet-status-dot { background: var(--map-inactive); }
+
+#mapPanel .map-fleet-arrow {
+  color: #456582;
+  font-size: 22px;
+  justify-self: end;
+}
+
+#mapPanel .map-fleet-empty {
+  padding: 32px 22px;
+  color: #657d9c;
+  font-size: 13px;
+  text-align: center;
+}
+
+#mapPanel .map-reference-legend {
+  min-height: 80px;
+  gap: 37px;
+  padding: 14px 16px;
+}
+
+#mapPanel #mapCount {
+  margin-left: auto;
+}
+
+/* Mantém o mapa limpo como na referência; popup do Leaflet só aparece por ação do usuário. */
+#mapPanel .leaflet-popup-pane {
+  z-index: 700;
+}
+
+@media (min-width: 1800px) {
+  #mapPanel .map-reference-stage {
+    grid-template-columns: minmax(0, 1fr) 405px;
+    min-height: min(650px, calc(100svh - 300px)) !important;
+  }
+  #mapPanel #fleetMap,
+  #mapPanel #mapDeviceDetails.map-fleet-list {
+    height: min(650px, calc(100svh - 300px)) !important;
+    min-height: 570px !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  #mapPanel .map-reference-stage {
+    grid-template-columns: minmax(0, 1fr) 315px;
+  }
+  #mapPanel .map-fleet-row {
+    grid-template-columns: 42px minmax(0, 1fr) 20px;
+    padding-left: 14px;
+  }
+  #mapPanel .map-fleet-vehicle-icon { width: 42px; height: 42px; }
+  #mapPanel .map-fleet-status { grid-column: 2; margin-top: -5px; }
+  #mapPanel .map-fleet-arrow { grid-column: 3; grid-row: 1 / span 2; }
+}
+
+@media (max-width: 1040px) {
+  #mapPanel .map-reference-header {
+    align-items: center;
+  }
+  #mapPanel .map-last-update {
+    display: none;
+  }
+  #mapPanel .map-reference-stage {
+    grid-template-columns: minmax(0, 1fr) 290px;
+  }
+}
+
+@media (max-width: 900px) {
+  #mapPanel .map-reference-stage {
+    display: block !important;
+    min-height: 0 !important;
+  }
+  #mapPanel #fleetMap {
+    height: 58svh !important;
+    min-height: 470px !important;
+  }
+  #mapPanel #mapDeviceDetails.map-fleet-list {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 390px !important;
+    border-left: 0 !important;
+    border-top: 1px solid #dce6f1 !important;
+  }
+  #mapPanel .map-fleet-list-body {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 720px) {
+  #mapPanel.map-panel {
+    padding: 18px 12px 18px !important;
+  }
+  #mapPanel .map-reference-header {
+    min-height: 72px;
+    padding-bottom: 15px;
+  }
+  #mapPanel .map-reference-header h1 {
+    font-size: 29px;
+  }
+  #mapPanel .map-status-grid {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #mapPanel #mapRefreshButton {
+    min-width: 52px;
+    width: 52px;
+  }
+  #mapPanel #mapRefreshButton > span:last-child {
+    display: none;
+  }
+  #mapPanel .map-reference-legend {
+    overflow-x: auto;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 430px) {
+  #mapPanel .map-reference-header h1 { font-size: 25px; }
+  #mapPanel .map-reference-header p { font-size: 12px; }
+  #mapPanel #fleetMap { min-height: 420px !important; }
+  #mapPanel .map-fleet-list-header { padding: 18px 16px 12px; }
+  #mapPanel .map-fleet-list-header strong { font-size: 18px; }
+  #mapPanel .map-fleet-row { min-height: 64px; }
+}
