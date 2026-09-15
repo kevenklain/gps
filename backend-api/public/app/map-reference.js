@@ -44,6 +44,20 @@
     });
   }
 
+  function showAllVehicles() {
+    const select = $('mapDeviceFilter');
+    if (select) select.value = 'all';
+
+    const fitButton = $('mapFitButton');
+    if (fitButton) {
+      fitButton.click();
+    } else if (select) {
+      select.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+
+    window.setTimeout(syncMapReference, 360);
+  }
+
   function renderFleetList(buttons) {
     const panel = $('mapDeviceDetails');
     if (!panel) return;
@@ -70,6 +84,23 @@
     }).join('');
 
     panel.innerHTML = `
+      <div class="map-fleet-all-section">
+        <button id="mapShowAllVehicles" class="map-show-all-vehicles" type="button">
+          <span class="map-show-all-icon" aria-hidden="true">
+            <span class="material-symbols-rounded">directions_car</span>
+            <span class="material-symbols-rounded">directions_car</span>
+          </span>
+          <span class="map-show-all-copy">
+            <strong>Ver todos os veículos</strong>
+            <small>Mostrar todos no mapa</small>
+          </span>
+          <span class="map-show-all-arrow material-symbols-rounded" aria-hidden="true">chevron_right</span>
+        </button>
+        <div class="map-show-all-info">
+          <span class="material-symbols-rounded" aria-hidden="true">info</span>
+          <span>Clique para exibir todos os veículos da frota no mapa ao mesmo tempo.</span>
+        </div>
+      </div>
       <div class="map-fleet-list-header">
         <strong>Veículos da Frota</strong>
         <span>${buttons.length} ${buttons.length === 1 ? 'veículo' : 'veículos'}</span>
@@ -77,6 +108,8 @@
       <div class="map-fleet-list-body">
         ${rows || '<div class="map-fleet-empty">Nenhum veículo disponível.</div>'}
       </div>`;
+
+    $('mapShowAllVehicles')?.addEventListener('click', showAllVehicles);
 
     panel.querySelectorAll('[data-map-device-index]').forEach((row) => {
       row.addEventListener('click', () => {
