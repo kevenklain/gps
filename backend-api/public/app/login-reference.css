@@ -1,0 +1,486 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0');
+
+/* Tela de login baseada no layout de referência 1672x941.
+   O restante do painel não é afetado por estas regras. */
+#loginView.login-shell {
+    --login-navy: #0f2d5b;
+    --login-muted: #6480aa;
+    --login-blue: #1476f3;
+    --login-border: #d6e2f0;
+    --login-soft: #eef6ff;
+    position: relative;
+    isolation: isolate;
+    min-height: 100svh;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    padding: clamp(42px, 10vh, 104px) clamp(24px, 4vw, 72px) clamp(66px, 10vh, 96px);
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    background-color: #f8fbff;
+    background-image:
+        linear-gradient(28deg, transparent 0 19%, rgba(222, 233, 246, .26) 19.15% 20.15%, rgba(255,255,255,.86) 20.3% 23.2%, rgba(220,232,245,.18) 23.35% 24.05%, transparent 24.2% 100%),
+        linear-gradient(151deg, transparent 0 65%, rgba(222,233,246,.22) 65.2% 66.1%, rgba(255,255,255,.9) 66.25% 69%, rgba(221,233,246,.18) 69.2% 70%, transparent 70.2% 100%),
+        linear-gradient(81deg, transparent 0 73%, rgba(226,236,247,.28) 73.2% 75.6%, transparent 75.8% 100%),
+        radial-gradient(circle at 16% 70%, rgba(218, 244, 233, .42) 0 4.5%, transparent 4.8%),
+        radial-gradient(circle at 88% 55%, rgba(218, 244, 233, .35) 0 5%, transparent 5.3%),
+        radial-gradient(circle at 80% 35%, rgba(221, 234, 251, .45) 0 5.5%, transparent 5.8%),
+        radial-gradient(circle at 50% 48%, rgba(255,255,255,.92) 0 27%, rgba(248,251,255,.75) 56%, #f8fbff 100%);
+}
+
+#loginView.login-shell::before {
+    content: 'location_on';
+    position: absolute;
+    z-index: -1;
+    top: 34%;
+    left: calc(50% + min(31vw, 510px));
+    width: clamp(94px, 8vw, 132px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    font-family: 'Material Symbols Rounded';
+    font-size: clamp(47px, 4vw, 66px);
+    line-height: 1;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48;
+    color: var(--login-blue);
+    background: rgba(221, 236, 255, .72);
+    box-shadow: 0 0 0 clamp(16px, 1.6vw, 27px) rgba(226, 239, 255, .5);
+    transform: translate(-50%, -50%);
+    opacity: .96;
+}
+
+#loginView.login-shell::after {
+    content: 'Ambulâncias MVP  •  Tecnologia para salvar vidas.';
+    position: absolute;
+    left: clamp(34px, 3.4vw, 58px);
+    bottom: clamp(26px, 5.6vh, 55px);
+    color: #6d87af;
+    font-size: clamp(12px, .86vw, 15px);
+    font-weight: 500;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+}
+
+#loginView .login-card {
+    position: relative;
+    z-index: 1;
+    width: min(clamp(560px, 35.7vw, 680px), calc(100vw - 40px));
+    min-height: clamp(650px, 78.85vh, 790px);
+    padding: clamp(46px, 5.8vh, 60px) clamp(38px, 3.15vw, 52px) clamp(28px, 3.2vh, 38px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    border: 1px solid rgba(226, 235, 245, .9);
+    border-radius: clamp(18px, 1.35vw, 22px);
+    background: rgba(255,255,255,.985);
+    box-shadow: 0 18px 52px rgba(57, 86, 122, .10);
+}
+
+#loginView .login-card::after {
+    content: 'Cidades mais seguras, sempre.';
+    position: fixed;
+    right: clamp(34px, 4.5vw, 76px);
+    bottom: clamp(26px, 5.6vh, 55px);
+    color: #6d87af;
+    font-size: clamp(12px, .86vw, 15px);
+    font-weight: 500;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+}
+
+/* Marca: usa exclusivamente Material Symbols para o ícone. */
+#loginView .brand-mark {
+    position: relative;
+    width: clamp(64px, 4.5vw, 76px);
+    height: clamp(56px, 4vw, 68px);
+    margin: 0 0 clamp(42px, 5.2vh, 53px) clamp(102px, 7.3vw, 122px);
+    display: grid;
+    place-items: center;
+    font-size: 0;
+    color: transparent;
+}
+
+#loginView .brand-mark::before {
+    content: 'ambulance';
+    font-family: 'Material Symbols Rounded';
+    font-size: clamp(54px, 3.9vw, 66px);
+    line-height: 1;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 48;
+    color: #126fe5;
+}
+
+#loginView .brand-mark::after {
+    content: 'Ambulâncias';
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 4px;
+    color: var(--login-navy);
+    font: 800 clamp(25px, 2vw, 33px)/1 'Inter', sans-serif;
+    letter-spacing: -.04em;
+    white-space: nowrap;
+}
+
+#loginView .login-card > h1 {
+    position: relative;
+    margin: 0 0 7px clamp(102px, 7.3vw, 122px);
+    min-height: clamp(42px, 4.2vw, 52px);
+    font-size: 0;
+    color: transparent;
+    line-height: 1;
+}
+
+#loginView .login-card > h1::before {
+    content: 'MVP';
+    position: absolute;
+    left: 0;
+    top: calc(-1 * clamp(80px, 9.4vh, 96px));
+    color: #657da4;
+    font: 500 clamp(20px, 1.55vw, 25px)/1 'Inter', sans-serif;
+    letter-spacing: -.02em;
+}
+
+#loginView .login-card > h1::after {
+    content: 'Acessar painel';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--login-navy);
+    font: 800 clamp(34px, 2.75vw, 43px)/1.1 'Inter', sans-serif;
+    letter-spacing: -.045em;
+    white-space: nowrap;
+}
+
+#loginView .login-card > .muted {
+    position: relative;
+    min-height: 26px;
+    margin: 0 0 clamp(32px, 3.9vh, 39px) clamp(102px, 7.3vw, 122px);
+    font-size: 0;
+    color: transparent;
+}
+
+#loginView .login-card > .muted::after {
+    content: 'Entre para acompanhar a frota.';
+    color: var(--login-muted);
+    font: 400 clamp(16px, 1.33vw, 20px)/1.3 'Inter', sans-serif;
+    letter-spacing: -.025em;
+    white-space: nowrap;
+}
+
+#loginView .stack-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(17px, 2vh, 21px) 18px;
+}
+
+#loginView .stack-form > label {
+    grid-column: 1 / -1;
+    position: relative;
+    display: grid;
+    gap: 8px;
+    color: #4f6b94;
+    font-size: clamp(15px, 1.08vw, 18px);
+    font-weight: 700;
+    letter-spacing: -.02em;
+}
+
+#loginView .stack-form > label::before {
+    position: absolute;
+    z-index: 2;
+    left: 17px;
+    bottom: 15px;
+    width: 23px;
+    height: 23px;
+    display: grid;
+    place-items: center;
+    font-family: 'Material Symbols Rounded';
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1;
+    color: #607ca5;
+    pointer-events: none;
+}
+
+#loginView .stack-form > label:has(#loginEmail)::before { content: 'mail'; }
+#loginView .stack-form > label:has(#loginSenha)::before { content: 'lock'; }
+
+#loginView .stack-form > label:has(#loginSenha)::after {
+    content: 'visibility';
+    position: absolute;
+    right: 17px;
+    bottom: 15px;
+    z-index: 2;
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    font-family: 'Material Symbols Rounded';
+    font-size: 22px;
+    line-height: 1;
+    color: #55759f;
+    pointer-events: none;
+}
+
+#loginView .stack-form input {
+    height: clamp(52px, 5.8vh, 57px);
+    padding: 0 52px;
+    border: 1px solid #cbd9eb;
+    border-radius: 9px;
+    outline: 0;
+    color: #38577e;
+    background-color: #fff;
+    font-size: clamp(15px, 1vw, 17px);
+    font-weight: 400;
+    box-shadow: 0 1px 1px rgba(47, 77, 114, .02);
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+/* Os campos já tinham credenciais de demo preenchidas. Para a tela inicial ficar
+   igual à referência, exibimos visualmente os placeholders até o usuário focar. */
+#loginView #loginEmail:not(:focus),
+#loginView #loginSenha:not(:focus) {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+#loginView #loginEmail:not(:focus) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='230' height='30'%3E%3Ctext x='0' y='20' font-family='Arial,sans-serif' font-size='16' fill='%236982a7'%3Eseu%40email.com%3C/text%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 59px center;
+}
+
+#loginView #loginSenha:not(:focus) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='30'%3E%3Ctext x='0' y='20' font-family='Arial,sans-serif' font-size='16' fill='%236982a7'%3ESua senha%3C/text%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 59px center;
+}
+
+#loginView .stack-form input:focus {
+    border-color: #77a9ed;
+    box-shadow: 0 0 0 3px rgba(20, 118, 243, .10);
+}
+
+/* Linha visual de opções presente na referência. Mantemos a autenticação original
+   intacta e não criamos handlers extras. */
+#loginView .stack-form::before {
+    content: 'check_box   Manter-me conectado';
+    grid-column: 1;
+    grid-row: 3;
+    align-self: center;
+    color: #58749c;
+    font: 400 clamp(14px, 1vw, 16px)/1 'Inter', sans-serif;
+    white-space: pre;
+}
+
+#loginView .stack-form::after {
+    content: 'Esqueci minha senha';
+    grid-column: 2;
+    grid-row: 3;
+    align-self: center;
+    justify-self: end;
+    color: #006ff2;
+    font: 600 clamp(14px, 1vw, 16px)/1 'Inter', sans-serif;
+    white-space: nowrap;
+}
+
+#loginView .stack-form > .btn.primary {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    position: relative;
+    height: clamp(56px, 6.25vh, 61px);
+    margin-top: 5px;
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    background: linear-gradient(180deg, #1679f5 0%, #0e6ff0 100%);
+    box-shadow: 0 8px 18px rgba(20, 118, 243, .18);
+    font-size: clamp(17px, 1.25vw, 20px);
+    font-weight: 600;
+    letter-spacing: -.01em;
+}
+
+#loginView .stack-form > .btn.primary::before {
+    content: 'login';
+    display: inline-block;
+    margin-right: 14px;
+    font-family: 'Material Symbols Rounded';
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 1;
+    vertical-align: -5px;
+}
+
+#loginView .stack-form > .btn.primary:hover {
+    background: linear-gradient(180deg, #0f70ea 0%, #0865dc 100%);
+}
+
+#loginView .hint {
+    position: relative;
+    min-height: clamp(77px, 8.5vh, 84px);
+    margin-top: clamp(40px, 4.65vh, 46px);
+    padding: 18px 18px 15px 82px;
+    border: 0;
+    border-radius: 11px;
+    background: #eef6ff;
+    color: transparent;
+    font-size: 0;
+    line-height: 1;
+}
+
+#loginView .hint::before {
+    content: 'group';
+    position: absolute;
+    left: 17px;
+    top: 50%;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    color: #0d72f2;
+    background: rgba(219, 235, 255, .72);
+    font-family: 'Material Symbols Rounded';
+    font-size: 31px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 40;
+}
+
+#loginView .hint > strong {
+    display: block;
+    min-height: 24px;
+    font-size: 0;
+    color: transparent;
+}
+
+#loginView .hint > strong::after {
+    content: 'Acesso de demonstração';
+    color: var(--login-navy);
+    font: 700 clamp(14px, .95vw, 16px)/1.2 'Inter', sans-serif;
+}
+
+#loginView .hint::after {
+    content: 'E-mail:  admin@ambulancias.local     |     Senha:  123456';
+    display: block;
+    margin-top: 3px;
+    color: #58749d;
+    font: 400 clamp(12px, .88vw, 14px)/1.35 'Inter', sans-serif;
+    white-space: nowrap;
+}
+
+/* Mantém o dado real de demonstração no DOM sem alterar o backend. */
+#loginView .hint br { display: none; }
+
+@media (min-aspect-ratio: 21/9) and (min-width: 1900px) {
+    #loginView.login-shell {
+        padding-top: clamp(74px, 9vh, 130px);
+        padding-bottom: clamp(82px, 9vh, 130px);
+        background-size: 120% 120%, 120% 120%, 100% 100%, auto, auto, auto, auto;
+    }
+    #loginView .login-card {
+        width: min(680px, 32vw);
+        min-height: min(820px, calc(100svh - 150px));
+        padding-left: 58px;
+        padding-right: 58px;
+    }
+    #loginView.login-shell::before {
+        left: calc(50% + min(28vw, 740px));
+    }
+}
+
+@media (max-height: 820px) and (min-width: 641px) {
+    #loginView.login-shell { padding-top: 28px; padding-bottom: 48px; }
+    #loginView .login-card {
+        min-height: 0;
+        padding-top: 34px;
+        padding-bottom: 25px;
+    }
+    #loginView .brand-mark { margin-bottom: 27px; }
+    #loginView .login-card > h1::before { top: -77px; }
+    #loginView .login-card > .muted { margin-bottom: 24px; }
+    #loginView .stack-form { gap: 14px 18px; }
+    #loginView .hint { margin-top: 27px; }
+}
+
+@media (max-width: 760px) {
+    #loginView.login-shell {
+        place-items: start center;
+        overflow-y: auto;
+        padding: 22px 14px 38px;
+        background-image:
+            radial-gradient(circle at 82% 19%, rgba(222,237,255,.75) 0 7%, transparent 7.4%),
+            linear-gradient(145deg, rgba(228,238,250,.30), transparent 38%),
+            linear-gradient(35deg, rgba(226,237,249,.20), transparent 45%);
+    }
+    #loginView.login-shell::before,
+    #loginView.login-shell::after,
+    #loginView .login-card::after { display: none; }
+    #loginView .login-card {
+        width: 100%;
+        min-height: 0;
+        padding: 31px 22px 25px;
+        border-radius: 17px;
+    }
+    #loginView .brand-mark {
+        margin: 0 auto 33px;
+        transform: translateX(-74px);
+    }
+    #loginView .brand-mark::after { font-size: 27px; }
+    #loginView .login-card > h1,
+    #loginView .login-card > .muted { margin-left: 0; }
+    #loginView .login-card > h1 { min-height: 42px; }
+    #loginView .login-card > h1::before {
+        left: calc(50% - 4px);
+        top: -68px;
+        font-size: 20px;
+    }
+    #loginView .login-card > h1::after {
+        font-size: clamp(31px, 9vw, 38px);
+    }
+    #loginView .login-card > .muted { margin-bottom: 27px; }
+    #loginView .login-card > .muted::after { font-size: 16px; }
+    #loginView .stack-form {
+        grid-template-columns: 1fr auto;
+        gap: 15px 10px;
+    }
+    #loginView .stack-form::before,
+    #loginView .stack-form::after { font-size: 13px; }
+    #loginView .hint {
+        margin-top: 29px;
+        min-height: 88px;
+        padding-left: 68px;
+    }
+    #loginView .hint::before {
+        left: 13px;
+        width: 43px;
+        height: 43px;
+        font-size: 28px;
+    }
+    #loginView .hint::after {
+        content: 'E-mail: admin@ambulancias.local\A Senha: 123456';
+        white-space: pre-line;
+    }
+}
+
+@media (max-width: 430px) {
+    #loginView .login-card { padding-left: 17px; padding-right: 17px; }
+    #loginView .brand-mark { transform: translateX(-64px); }
+    #loginView .brand-mark::after { font-size: 24px; }
+    #loginView .stack-form {
+        grid-template-columns: 1fr;
+    }
+    #loginView .stack-form::before {
+        grid-column: 1;
+        grid-row: 3;
+    }
+    #loginView .stack-form::after {
+        grid-column: 1;
+        grid-row: 4;
+        justify-self: start;
+        margin-top: -7px;
+    }
+    #loginView .stack-form > .btn.primary {
+        grid-column: 1;
+        grid-row: 5;
+    }
+    #loginView .hint::after { font-size: 11.5px; }
+}
