@@ -6,152 +6,6 @@
     <title>Gestão de Ambulâncias</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="./styles.css">
-    <style>
-        /* Ajustes específicos do mapa: mais área útil, expansão e leitura rápida de status. */
-        .content-shell.map-page-active > .topbar { display: none; }
-        #mapaPage { padding-top: 18px; }
-        .map-panel .panel-header { padding: 14px 18px; }
-        .map-panel .panel-header .inline-controls {
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-        .map-panel .panel-header .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            border: 1px solid transparent;
-            transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
-        }
-        .map-panel .panel-header .btn:hover {
-            transform: translateY(-1px);
-            filter: brightness(.98);
-            box-shadow: 0 4px 12px rgba(16, 24, 40, .10);
-        }
-        .map-panel #mapExpandButton {
-            background: #e8f0fe;
-            color: #185abc;
-            border-color: #b8cff7;
-        }
-        .map-panel #mapExpandButton::before { content: "⛶"; font-size: 16px; }
-        .map-panel #refreshButton {
-            background: #e7f7ef;
-            color: #0f6842;
-            border-color: #b7e5cc;
-        }
-        .map-panel #refreshButton::before { content: "↻"; font-size: 18px; line-height: 1; }
-        .map-panel #mapFitButton {
-            background: #f1ebff;
-            color: #6941c6;
-            border-color: #d8c7fb;
-        }
-        .map-panel #mapFitButton::before { content: "⌖"; font-size: 17px; }
-        .map-panel #mapWorldButton {
-            background: #e6f7f5;
-            color: #0f766e;
-            border-color: #b7e4df;
-        }
-        .map-panel #mapWorldButton::before { content: "🌍"; font-size: 16px; }
-        .map-panel .map-summary { margin: 10px 0 6px; }
-        .map-panel .map-toolbar { padding: 0 18px 10px; gap: 8px; }
-        .map-panel .map-toolbar p { margin: 0; }
-        .map-panel .map-layout {
-            grid-template-columns: minmax(0, 1fr) 230px;
-            gap: 14px;
-            padding: 0 18px 18px;
-            align-items: stretch;
-        }
-        .map-panel #fleetMap {
-            height: clamp(480px, 68vh, 780px);
-            min-height: 480px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-        .map-panel .map-devices {
-            max-height: 68vh;
-            padding: 0;
-        }
-        .map-device {
-            border-left: 5px solid var(--border);
-            transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
-        }
-        .map-device.status-online {
-            border-color: var(--success);
-            background: #eaf8f1;
-            color: #0f6842;
-        }
-        .map-device.status-sem_comunicacao {
-            border-color: var(--warning);
-            background: #fff6e5;
-            color: #855000;
-        }
-        .map-device.status-offline {
-            border-color: var(--danger);
-            background: #fdecec;
-            color: #982020;
-        }
-        .map-device.status-inativo {
-            border-color: #667085;
-            background: #f1f3f5;
-            color: #475467;
-        }
-        .map-device:hover:not(:disabled), .map-device:focus-visible {
-            box-shadow: 0 0 0 2px rgba(21, 101, 192, .10);
-        }
-        body.map-modal-open { overflow: hidden; }
-        .map-panel.map-expanded {
-            position: fixed;
-            inset: 12px;
-            z-index: 2000;
-            margin: 0;
-            border-radius: 16px;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
-            overflow: auto;
-            background: var(--surface);
-        }
-        .map-panel.map-expanded .panel-header {
-            position: sticky;
-            top: 0;
-            z-index: 1001;
-            background: var(--surface);
-        }
-        .map-panel.map-expanded .map-layout {
-            grid-template-columns: minmax(0, 1fr) 280px;
-            height: calc(100vh - 255px);
-            min-height: 520px;
-        }
-        .map-panel.map-expanded #fleetMap {
-            height: 100%;
-            min-height: 520px;
-        }
-        .map-panel.map-expanded .map-devices {
-            max-height: none;
-            height: 100%;
-        }
-        @media (max-width: 1100px) {
-            .map-panel .map-layout { grid-template-columns: 1fr; }
-            .map-panel .map-devices { max-height: 180px; }
-            .map-panel.map-expanded .map-layout {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-            .map-panel.map-expanded #fleetMap { height: calc(100vh - 360px); }
-            .map-panel.map-expanded .map-devices { height: auto; max-height: 150px; }
-        }
-        @media (max-width: 720px) {
-            .map-panel .panel-header .inline-controls { width: 100%; justify-content: stretch; }
-            .map-panel .panel-header .btn { flex: 1 1 calc(50% - 8px); }
-        }
-        @media (max-width: 560px) {
-            #mapaPage { padding: 10px; }
-            .map-panel.map-expanded { inset: 4px; border-radius: 10px; }
-            .map-panel #fleetMap { min-height: 380px; height: 58vh; }
-            .map-panel.map-expanded #fleetMap { height: calc(100vh - 390px); min-height: 360px; }
-            .map-panel .panel-header .btn { flex-basis: 100%; }
-        }
-    </style>
 </head>
 <body>
     <div id="toast" class="toast" aria-live="polite"></div>
@@ -161,28 +15,19 @@
             <div class="brand-mark">🚑</div>
             <h1>Gestão de Ambulâncias</h1>
             <p class="muted">Painel web do MVP</p>
-
             <form id="loginForm" class="stack-form">
-                <label>
-                    E-mail
-                    <input id="loginEmail" type="email" value="admin@ambulancias.local" required autocomplete="username">
-                </label>
-                <label>
-                    Senha
-                    <input id="loginSenha" type="password" value="admin123" required autocomplete="current-password">
-                </label>
+                <label>E-mail<input id="loginEmail" type="email" required autocomplete="username"></label>
+                <label>Senha<input id="loginSenha" type="password" required autocomplete="current-password"></label>
                 <button class="btn primary" type="submit">Entrar</button>
             </form>
-
-            <div class="hint">
-                <strong>Acesso inicial:</strong><br>
-                admin@ambulancias.local / admin123
-            </div>
+            <div class="hint"><strong>Acesso inicial:</strong><br>admin@ambulancias.local / admin123</div>
         </section>
     </main>
 
     <div id="appView" class="app-shell hidden">
-        <aside class="sidebar">
+        <div id="sidebarBackdrop" aria-hidden="true"></div>
+
+        <aside class="sidebar" aria-label="Menu principal">
             <div class="sidebar-brand">
                 <span class="brand-mark small">🚑</span>
                 <div>
@@ -192,95 +37,149 @@
             </div>
 
             <nav id="navigation" class="navigation">
-                <button data-page="dashboard" class="nav-item active">Visão geral</button>
-                <button data-page="mapa" class="nav-item">Mapa</button>
-                <button data-page="usuarios" class="nav-item admin-only">Usuários</button>
-                <button data-page="dispositivos" class="nav-item">Dispositivos</button>
-                <button data-page="localizacoes" class="nav-item">Localizações</button>
+                <button data-page="mapa" class="nav-item active" type="button">Mapa</button>
+                <button data-page="dashboard" class="nav-item" type="button">Visão geral</button>
+                <button data-page="dispositivos" class="nav-item" type="button">Dispositivos</button>
+                <button data-page="usuarios" class="nav-item admin-only" type="button">Usuários</button>
+                <button data-page="localizacoes" class="nav-item" type="button">Localizações</button>
             </nav>
 
             <div class="sidebar-user">
                 <strong id="sidebarUserName">Usuário</strong>
                 <small id="sidebarUserType">-</small>
-                <button id="logoutButton" class="btn ghost full">Sair</button>
+                <button id="logoutButton" class="btn ghost full" type="button">Sair</button>
             </div>
         </aside>
 
         <div class="content-shell">
             <header class="topbar">
                 <div>
-                    <h2 id="pageTitle">Visão geral</h2>
-                    <p id="pageSubtitle" class="muted">Resumo atual da frota</p>
+                    <h2 id="pageTitle">Mapa da Frota</h2>
+                    <p id="pageSubtitle" class="muted">Acompanhe a posição e o status das ambulâncias em tempo real.</p>
                 </div>
-                <button id="refreshButton" class="btn secondary">Atualizar</button>
+                <button id="refreshButton" class="btn secondary" type="button">Atualizar</button>
             </header>
 
-            <section id="dashboardPage" class="page active">
+            <section id="mapaPage" class="page active">
+                <section id="mapPanel" class="panel map-panel">
+                    <header class="map-reference-header">
+                        <div class="map-reference-title-wrap">
+                            <button id="mapMobileMenuButton" class="map-mobile-menu-button" type="button" aria-label="Abrir menu">
+                                <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+                            </button>
+                            <div class="map-reference-title-copy">
+                                <h1>Mapa da Frota</h1>
+                                <p>Acompanhe a posição e o status das ambulâncias em tempo real.</p>
+                            </div>
+                        </div>
+
+                        <div class="map-reference-actions">
+                            <div class="map-last-update" aria-label="Última atualização">
+                                <span class="map-last-update-dot"></span>
+                                <div class="map-last-update-copy">
+                                    <small>Última atualização</small>
+                                    <strong id="mapLastUpdated">--/--/----, --:--:--</strong>
+                                </div>
+                            </div>
+                            <button id="mapRefreshButton" class="map-reference-action-button" type="button">
+                                <span class="material-symbols-rounded" aria-hidden="true">refresh</span>
+                                <span>Atualizar</span>
+                            </button>
+                            <button id="mapFilterButton" class="map-reference-action-button" type="button">
+                                <span class="material-symbols-rounded" aria-hidden="true">filter_alt</span>
+                                <span>Filtros</span>
+                            </button>
+                        </div>
+                    </header>
+
+                    <div class="map-reference-tools">
+                        <div class="map-status-grid" aria-label="Resumo dos status">
+                            <article class="map-status-card online">
+                                <span class="map-status-dot"></span>
+                                <div class="map-status-copy"><strong id="mapStatOnline">0</strong><span>Online</span></div>
+                            </article>
+                            <article class="map-status-card warning">
+                                <span class="map-status-dot"></span>
+                                <div class="map-status-copy"><strong id="mapStatWarning">0</strong><span>Sem comunicação</span></div>
+                            </article>
+                            <article class="map-status-card offline">
+                                <span class="map-status-dot"></span>
+                                <div class="map-status-copy"><strong id="mapStatOffline">0</strong><span>Offline</span></div>
+                            </article>
+                            <article class="map-status-card inactive">
+                                <span class="map-status-dot"></span>
+                                <div class="map-status-copy"><strong id="mapStatInactive">0</strong><span>Inativo</span></div>
+                            </article>
+                        </div>
+
+                        <div class="map-search-filter">
+                            <div class="map-search-box">
+                                <span class="material-symbols-rounded" aria-hidden="true">search</span>
+                                <input id="mapSearch" type="search" placeholder="Buscar veículo por placa, modelo ou responsável..." autocomplete="off">
+                            </div>
+                            <select id="mapDeviceFilter" aria-label="Filtrar ambulância">
+                                <option value="all">Todas as ambulâncias</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p id="mapSummary" aria-live="polite">Carregando ambulâncias...</p>
+                    <p id="mapError" class="map-error hidden" role="alert"></p>
+
+                    <div class="map-hidden-controls" aria-hidden="true">
+                        <button id="mapFitButton" type="button">Ver todas</button>
+                        <button id="mapWorldButton" type="button">Mapa mundial</button>
+                        <button id="mapSimulationButton" class="admin-only" type="button">Iniciar simulação em Brasília</button>
+                        <p id="mapSimulationStatus">Posições mais recentes atualizadas a cada 5 segundos enquanto o mapa estiver aberto.</p>
+                    </div>
+
+                    <div class="map-reference-map-card">
+                        <div class="map-reference-stage">
+                            <div id="fleetMap" aria-label="Mapa das ambulâncias"></div>
+                            <aside id="mapDeviceDetails" class="map-device-detail is-hidden" aria-live="polite"></aside>
+                        </div>
+
+                        <footer class="map-reference-legend">
+                            <div class="map-legend-item">
+                                <span class="map-legend-dot online"></span>
+                                <div class="map-legend-copy"><strong>Online</strong><small>Em movimento</small></div>
+                            </div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-dot warning"></span>
+                                <div class="map-legend-copy"><strong>Sem comunicação</strong><small>Sem sinal recente</small></div>
+                            </div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-dot offline"></span>
+                                <div class="map-legend-copy"><strong>Offline</strong><small>Veículo offline</small></div>
+                            </div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-dot inactive"></span>
+                                <div class="map-legend-copy"><strong>Inativo</strong><small>Fora de operação</small></div>
+                            </div>
+                            <span id="mapCount">0 ambulâncias no mapa</span>
+                        </footer>
+                    </div>
+
+                    <div id="mapDevices" class="map-devices" aria-label="Ambulâncias no mapa"></div>
+                </section>
+            </section>
+
+            <section id="dashboardPage" class="page">
                 <div class="stats-grid">
                     <article class="stat-card"><span>Total</span><strong id="statTotal">0</strong></article>
                     <article class="stat-card"><span>Online</span><strong id="statOnline">0</strong></article>
                     <article class="stat-card"><span>Sem comunicação</span><strong id="statWarning">0</strong></article>
                     <article class="stat-card"><span>Offline</span><strong id="statOffline">0</strong></article>
                 </div>
-
                 <section class="panel">
                     <div class="panel-header">
-                        <div>
-                            <h3>Frota</h3>
-                            <p class="muted">Última posição conhecida de cada dispositivo.</p>
-                        </div>
+                        <div><h3>Frota</h3><p class="muted">Última posição conhecida de cada dispositivo.</p></div>
                     </div>
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Ambulância</th>
-                                    <th>Placa</th>
-                                    <th>Status</th>
-                                    <th>Localização</th>
-                                    <th>Velocidade</th>
-                                    <th>Bateria</th>
-                                    <th>Última comunicação</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Ambulância</th><th>Placa</th><th>Status</th><th>Localização</th><th>Velocidade</th><th>Bateria</th><th>Última comunicação</th></tr></thead>
                             <tbody id="dashboardDevicesBody"></tbody>
                         </table>
-                    </div>
-                </section>
-            </section>
-
-            <section id="mapaPage" class="page">
-                <section id="mapPanel" class="panel map-panel">
-                    <div class="panel-header wrap">
-                        <div>
-                            <h3>Mapa da frota</h3>
-                            <p class="muted">Última posição recebida. Clique em uma ambulância para ver os detalhes.</p>
-                        </div>
-                        <div class="inline-controls">
-                            <button id="mapExpandButton" class="btn secondary" type="button" aria-expanded="false">Expandir mapa</button>
-                            <button id="mapFitButton" class="btn secondary">Ver todas</button>
-                            <button id="mapWorldButton" class="btn secondary">Mapa mundial</button>
-                        </div>
-                    </div>
-                    <p id="mapSummary" class="map-summary" aria-live="polite">Carregando ambulâncias...</p>
-                    <p id="mapError" class="map-error hidden" role="alert"></p>
-                    <div class="map-toolbar">
-                        <label>Exibir no mapa
-                            <select id="mapDeviceFilter"><option value="all">Todas as ambulâncias</option></select>
-                        </label>
-                        <button id="mapSimulationButton" class="btn primary admin-only" type="button">Iniciar simulação em Brasília</button>
-                        <p id="mapSimulationStatus" class="muted" aria-live="polite">Posições mais recentes atualizadas a cada 5 segundos enquanto o mapa estiver aberto.</p>
-                    </div>
-                    <div class="map-layout">
-                        <div id="fleetMap" aria-label="Mapa das ambulâncias"></div>
-                        <div id="mapDevices" class="map-devices" aria-label="Ambulâncias no mapa"></div>
-                    </div>
-                    <div class="map-legend">
-                        <span class="badge online">Online</span>
-                        <span class="badge sem_comunicacao">Sem comunicação</span>
-                        <span class="badge offline">Offline</span>
-                        <span class="badge inativo">Inativo</span>
-                        <span class="muted">Selecione todas ou uma ambulância. Os dados de exemplo em Brasília são fictícios.</span>
                     </div>
                 </section>
             </section>
@@ -288,24 +187,12 @@
             <section id="usuariosPage" class="page">
                 <section class="panel">
                     <div class="panel-header">
-                        <div>
-                            <h3>Usuários</h3>
-                            <p class="muted">Administradores e funcionários.</p>
-                        </div>
-                        <button id="newUserButton" class="btn primary">Novo usuário</button>
+                        <div><h3>Usuários</h3><p class="muted">Administradores e funcionários.</p></div>
+                        <button id="newUserButton" class="btn primary" type="button">Novo usuário</button>
                     </div>
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>E-mail</th>
-                                    <th>Tipo</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Tipo</th><th>Status</th><th>Ações</th></tr></thead>
                             <tbody id="usersBody"></tbody>
                         </table>
                     </div>
@@ -315,26 +202,12 @@
             <section id="dispositivosPage" class="page">
                 <section class="panel">
                     <div class="panel-header">
-                        <div>
-                            <h3>Dispositivos / Ambulâncias</h3>
-                            <p class="muted">Cada dispositivo representa o tablet vinculado a uma ambulância.</p>
-                        </div>
-                        <button id="newDeviceButton" class="btn primary admin-only">Novo dispositivo</button>
+                        <div><h3>Dispositivos / Ambulâncias</h3><p class="muted">Cada dispositivo representa o tablet vinculado a uma ambulância.</p></div>
+                        <button id="newDeviceButton" class="btn primary admin-only" type="button">Novo dispositivo</button>
                     </div>
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Identificador</th>
-                                    <th>Placa</th>
-                                    <th>Funcionário</th>
-                                    <th>KM</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>ID</th><th>Nome</th><th>Identificador</th><th>Placa</th><th>Funcionário</th><th>KM</th><th>Status</th><th>Ações</th></tr></thead>
                             <tbody id="devicesBody"></tbody>
                         </table>
                     </div>
@@ -344,28 +217,16 @@
             <section id="localizacoesPage" class="page">
                 <section class="panel">
                     <div class="panel-header wrap">
-                        <div>
-                            <h3>Histórico de localizações</h3>
-                            <p class="muted">Selecione um dispositivo para consultar os pontos GPS gravados.</p>
-                        </div>
+                        <div><h3>Histórico de localizações</h3><p class="muted">Selecione um dispositivo para consultar os pontos GPS gravados.</p></div>
                         <div class="inline-controls">
                             <select id="locationDeviceSelect"></select>
-                            <button id="loadLocationsButton" class="btn secondary">Carregar</button>
-                            <button id="simulateLocationButton" class="btn primary admin-only">Simular GPS</button>
+                            <button id="loadLocationsButton" class="btn secondary" type="button">Carregar</button>
+                            <button id="simulateLocationButton" class="btn primary admin-only" type="button">Simular GPS</button>
                         </div>
                     </div>
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Data/Hora</th>
-                                    <th>Latitude</th>
-                                    <th>Longitude</th>
-                                    <th>Velocidade</th>
-                                    <th>Precisão</th>
-                                    <th>Bateria</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Data/Hora</th><th>Latitude</th><th>Longitude</th><th>Velocidade</th><th>Precisão</th><th>Bateria</th></tr></thead>
                             <tbody id="locationsBody"></tbody>
                         </table>
                     </div>
@@ -377,37 +238,23 @@
     <dialog id="userDialog" class="modal">
         <form id="userForm" class="modal-card">
             <div class="modal-header">
-                <div>
-                    <h3 id="userDialogTitle">Novo usuário</h3>
-                    <p class="muted">Preencha os dados abaixo.</p>
-                </div>
+                <div><h3 id="userDialogTitle">Novo usuário</h3><p class="muted">Preencha os dados abaixo.</p></div>
                 <button type="button" class="icon-button" data-close-dialog="userDialog">×</button>
             </div>
             <input id="userId" type="hidden">
             <label>Nome<input id="userName" required maxlength="150"></label>
             <label>E-mail<input id="userEmail" type="email" required maxlength="150"></label>
             <label>Senha <small id="userPasswordHint" class="muted">mínimo 6 caracteres</small><input id="userPassword" type="password" minlength="6"></label>
-            <label>Tipo
-                <select id="userType" required>
-                    <option value="funcionario">Funcionário</option>
-                    <option value="admin">Administrador</option>
-                </select>
-            </label>
+            <label>Tipo<select id="userType" required><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select></label>
             <label class="checkbox-row"><input id="userActive" type="checkbox" checked> Usuário ativo</label>
-            <div class="modal-actions">
-                <button type="button" class="btn ghost" data-close-dialog="userDialog">Cancelar</button>
-                <button type="submit" class="btn primary">Salvar</button>
-            </div>
+            <div class="modal-actions"><button type="button" class="btn ghost" data-close-dialog="userDialog">Cancelar</button><button type="submit" class="btn primary">Salvar</button></div>
         </form>
     </dialog>
 
     <dialog id="deviceDialog" class="modal">
         <form id="deviceForm" class="modal-card">
             <div class="modal-header">
-                <div>
-                    <h3 id="deviceDialogTitle">Novo dispositivo</h3>
-                    <p class="muted">Cadastre o tablet e os dados básicos da ambulância.</p>
-                </div>
+                <div><h3 id="deviceDialogTitle">Novo dispositivo</h3><p class="muted">Cadastre o tablet e os dados básicos da ambulância.</p></div>
                 <button type="button" class="icon-button" data-close-dialog="deviceDialog">×</button>
             </div>
             <input id="deviceId" type="hidden">
@@ -418,37 +265,25 @@
             <label>Quilometragem<input id="deviceMileage" type="number" min="0" step="0.01" value="0"></label>
             <label>Funcionário responsável<select id="deviceUser"></select></label>
             <label class="checkbox-row"><input id="deviceActive" type="checkbox" checked> Dispositivo ativo</label>
-            <div class="modal-actions">
-                <button type="button" class="btn ghost" data-close-dialog="deviceDialog">Cancelar</button>
-                <button type="submit" class="btn primary">Salvar</button>
-            </div>
+            <div class="modal-actions"><button type="button" class="btn ghost" data-close-dialog="deviceDialog">Cancelar</button><button type="submit" class="btn primary">Salvar</button></div>
         </form>
     </dialog>
 
     <dialog id="tokenDialog" class="modal">
         <div class="modal-card">
             <div class="modal-header">
-                <div>
-                    <h3>Token do dispositivo</h3>
-                    <p class="muted">Copie agora. O valor aberto não fica disponível depois.</p>
-                </div>
+                <div><h3>Token do dispositivo</h3><p class="muted">Copie agora. O valor aberto não fica disponível depois.</p></div>
                 <button type="button" class="icon-button" data-close-dialog="tokenDialog">×</button>
             </div>
             <textarea id="deviceTokenOutput" class="token-output" readonly></textarea>
-            <div class="modal-actions">
-                <button id="copyTokenButton" type="button" class="btn primary">Copiar token</button>
-                <button type="button" class="btn ghost" data-close-dialog="tokenDialog">Fechar</button>
-            </div>
+            <div class="modal-actions"><button id="copyTokenButton" type="button" class="btn primary">Copiar token</button><button type="button" class="btn ghost" data-close-dialog="tokenDialog">Fechar</button></div>
         </div>
     </dialog>
 
     <dialog id="locationDialog" class="modal">
         <form id="locationForm" class="modal-card">
             <div class="modal-header">
-                <div>
-                    <h3>Simular envio do tablet</h3>
-                    <p class="muted">Use o token do dispositivo para testar o POST /api/localizacoes.</p>
-                </div>
+                <div><h3>Simular envio do tablet</h3><p class="muted">Use o token do dispositivo para testar o POST /api/localizacoes.</p></div>
                 <button type="button" class="icon-button" data-close-dialog="locationDialog">×</button>
             </div>
             <label>Token do dispositivo<textarea id="locationDeviceToken" required rows="3" placeholder="Cole o device_token aqui"></textarea></label>
@@ -464,83 +299,12 @@
                 <label>Bateria %<input id="locationBattery" type="number" min="0" max="100" value="80"></label>
                 <label>Quilometragem<input id="locationMileage" type="number" min="0" step="0.01" value="82541"></label>
             </div>
-            <div class="modal-actions">
-                <button type="button" class="btn ghost" data-close-dialog="locationDialog">Cancelar</button>
-                <button type="submit" class="btn primary">Enviar GPS</button>
-            </div>
+            <div class="modal-actions"><button type="button" class="btn ghost" data-close-dialog="locationDialog">Cancelar</button><button type="submit" class="btn primary">Enviar GPS</button></div>
         </form>
     </dialog>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="./app.js"></script>
-    <script>
-        (() => {
-            const panel = document.getElementById('mapPanel');
-            const expandButton = document.getElementById('mapExpandButton');
-            const devices = document.getElementById('mapDevices');
-            const mapPage = document.getElementById('mapaPage');
-            const contentShell = document.querySelector('.content-shell');
-            const mapActions = panel.querySelector('.panel-header .inline-controls');
-            const refreshButton = document.getElementById('refreshButton');
-            const refreshOriginalParent = refreshButton.parentElement;
-            const fitButton = document.getElementById('mapFitButton');
-
-            function refreshLeafletSize() {
-                window.setTimeout(() => {
-                    try {
-                        fleetMap?.invalidateSize();
-                        fitFleetMap();
-                    } catch (_) {}
-                }, 120);
-            }
-
-            function syncMapHeader() {
-                const mapActive = mapPage.classList.contains('active');
-                contentShell.classList.toggle('map-page-active', mapActive);
-
-                if (mapActive) {
-                    if (refreshButton.parentElement !== mapActions) {
-                        mapActions.insertBefore(refreshButton, fitButton);
-                    }
-                } else if (refreshButton.parentElement !== refreshOriginalParent) {
-                    refreshOriginalParent.appendChild(refreshButton);
-                }
-            }
-
-            function setExpanded(expanded) {
-                panel.classList.toggle('map-expanded', expanded);
-                document.body.classList.toggle('map-modal-open', expanded);
-                expandButton.textContent = expanded ? 'Fechar tela cheia' : 'Expandir mapa';
-                expandButton.setAttribute('aria-expanded', String(expanded));
-                refreshLeafletSize();
-            }
-
-            expandButton.addEventListener('click', () => {
-                setExpanded(!panel.classList.contains('map-expanded'));
-            });
-
-            document.addEventListener('keydown', event => {
-                if (event.key === 'Escape' && panel.classList.contains('map-expanded')) {
-                    setExpanded(false);
-                }
-            });
-
-            function colorStatusCards() {
-                devices.querySelectorAll('.map-device').forEach(button => {
-                    button.classList.remove('status-online', 'status-sem_comunicacao', 'status-offline', 'status-inativo');
-                    const text = button.textContent || '';
-                    if (text.includes('Sem comunicação')) button.classList.add('status-sem_comunicacao');
-                    else if (text.includes('Offline')) button.classList.add('status-offline');
-                    else if (text.includes('Inativo')) button.classList.add('status-inativo');
-                    else if (text.includes('Online')) button.classList.add('status-online');
-                });
-            }
-
-            new MutationObserver(colorStatusCards).observe(devices, {childList: true, subtree: true, characterData: true});
-            new MutationObserver(syncMapHeader).observe(mapPage, {attributes: true, attributeFilter: ['class']});
-            colorStatusCards();
-            syncMapHeader();
-        })();
-    </script>
+    <script src="./map-reference.js"></script>
 </body>
 </html>
