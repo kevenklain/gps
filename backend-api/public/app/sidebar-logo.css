@@ -1,0 +1,50 @@
+/* Marca LocalizaFrota no menu lateral.
+   Usa o asset local do projeto para não depender de URL externa. */
+#appView .sidebar-brand {
+  min-height: 68px;
+  height: 68px;
+  margin: 0 2px 14px;
+  padding: 8px 10px;
+  display: block;
+  border: 1px solid rgba(220, 232, 245, .82);
+  border-radius: 12px;
+  background-color: #ffffff;
+  background-image: url('./localizafrota-logo.png?v=20260915-sidebar');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: calc(100% - 22px) auto;
+  box-shadow: 0 5px 16px rgba(0, 18, 38, .12);
+}
+
+/* Esconde apenas a marca antiga; a navegação e o restante da sidebar permanecem intactos. */
+#appView .sidebar-brand > .brand-mark,
+#appView .sidebar-brand > div {
+  display: none !important;
+}
+
+@media (min-width: 1800px) {
+  #appView .sidebar-brand {
+    min-height: 72px;
+    height: 72px;
+    background-size: calc(100% - 20px) auto;
+  }
+}
+
+@media (max-width: 900px) {
+  #appView .sidebar-brand {
+    min-height: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+    background-size: calc(100% - 28px) auto;
+  }
+}
+
+@media (max-width: 430px) {
+  #appView .sidebar-brand {
+    min-height: 60px;
+    height: 60px;
+    margin-left: 4px;
+    margin-right: 4px;
+    background-size: calc(100% - 32px) auto;
+  }
+}
