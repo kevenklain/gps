@@ -1,0 +1,145 @@
+/* Split view redimensionável: mapa + lista de veículos. */
+#mapPanel .map-reference-stage {
+  --map-list-width: 360px;
+  position: relative;
+  display: grid !important;
+  grid-template-columns: minmax(360px, 1fr) 12px minmax(280px, var(--map-list-width)) !important;
+  align-items: stretch;
+}
+
+#mapPanel #fleetMap {
+  grid-column: 1 !important;
+  min-width: 0;
+}
+
+#mapPanel #mapDeviceDetails.map-fleet-list {
+  grid-column: 3 !important;
+  min-width: 0 !important;
+  border-left: 0 !important;
+}
+
+#mapPanel .map-split-handle {
+  grid-column: 2;
+  position: relative;
+  z-index: 850;
+  width: 12px;
+  min-width: 12px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid #d7e2ee;
+  border-right: 1px solid #d7e2ee;
+  outline: 0;
+  background: #f7faff;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+#mapPanel .map-split-handle::before {
+  content: '';
+  position: absolute;
+  inset: 0 -5px;
+}
+
+#mapPanel .map-split-handle:hover,
+#mapPanel .map-split-handle:focus-visible,
+body.map-split-resizing #mapPanel .map-split-handle {
+  background: #eaf3ff;
+  border-color: #76aef5;
+}
+
+#mapPanel .map-split-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 1px solid #c8d9ec;
+  border-radius: 9px;
+  color: #53759b;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(40, 73, 112, .12);
+  pointer-events: none;
+}
+
+#mapPanel .map-split-grip .material-symbols-rounded {
+  font-size: 21px;
+}
+
+#mapPanel .map-split-controls {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  transform: translateX(-50%);
+  border: 1px solid #d3dfed;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 5px 16px rgba(34, 66, 103, .14);
+  cursor: default;
+}
+
+#mapPanel .map-split-control {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  color: #4d6c91;
+  background: transparent;
+  cursor: pointer;
+}
+
+#mapPanel .map-split-control:hover,
+#mapPanel .map-split-control:focus-visible {
+  color: #086ee9;
+  background: #edf5ff;
+  outline: none;
+}
+
+#mapPanel .map-split-control.is-active {
+  color: #086ee9;
+  background: #e4f0ff;
+}
+
+#mapPanel .map-split-control .material-symbols-rounded {
+  font-size: 20px;
+}
+
+body.map-split-resizing,
+body.map-split-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+@media (max-width: 1180px) and (min-width: 901px) {
+  #mapPanel .map-reference-stage {
+    grid-template-columns: minmax(330px, 1fr) 12px minmax(270px, var(--map-list-width)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #mapPanel .map-reference-stage {
+    display: block !important;
+    --map-list-width: auto;
+  }
+
+  #mapPanel .map-split-handle {
+    display: none !important;
+  }
+
+  #mapPanel #mapDeviceDetails.map-fleet-list {
+    width: 100% !important;
+    border-top: 1px solid #dce6f1 !important;
+  }
+}
