@@ -6,6 +6,7 @@ use App\Models\Dispositivo;
 use App\Models\Usuario;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -118,14 +119,23 @@ class DispositivoController extends Controller
     public function excluir(Dispositivo $dispositivo): JsonResponse
     {
         $nome = $dispositivo->nome;
+        $dispositivoId = $dispositivo->id;
 
-        // A FK de localizacoes usa cascadeOnDelete, portanto a exclusao permanente
-        // remove tambem o historico GPS associado ao dispositivo.
-        $dispositivo->delete();
+        // Alguns bancos existentes possuem a FK localizacoes_dispositivo_id_foreign
+        // configurada como RESTRICT. Por isso a exclusao permanente remove primeiro
+        // os pontos GPS e depois o dispositivo, tudo na mesma transacao. Se qualquer
+        // etapa falhar, nada e removido parcialmente.
+        DB::transaction(function () use ($dispositivo, $dispositivoId): void {
+            DB::table('localizacoes')
+                ->where('dispositivo_id', $dispositivoId)
+                ->delete();
+
+            $dispositivo->delete();
+        });
 
         return response()->json([
             'sucesso' => true,
-            'mensagem' => "Veiculo \"{$nome}\" excluido permanentemente.",
+            'mensagem' => "Veiculo \"{$nome}\" e seu historico GPS foram excluidos permanentemente.",
         ]);
     }
 
