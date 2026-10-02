@@ -12,6 +12,8 @@ services:
       - .:/app
       # Evita que o node_modules do host sobrescreva o instalado no container.
       - node_modules:/app/node_modules
+      # Persiste a sessao do Expo CLI para nao exigir login a cada rebuild.
+      - expo_data:/root/.expo
     environment:
       NODE_ENV: development
       # O start-mobile.sh detecta o IP LAN atual do Mac para a API Laravel.
@@ -25,3 +27,4 @@ services:
 
 volumes:
   node_modules:
+  expo_data:
