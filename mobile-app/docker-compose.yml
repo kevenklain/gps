@@ -15,7 +15,8 @@ services:
     environment:
       NODE_ENV: development
       # O start-mobile.sh detecta o IP LAN atual do Mac para a API Laravel.
-      EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL:?Execute ./start-mobile.sh para detectar o IP da API}
+      # Se iniciar o Compose diretamente, a variavel pode ser informada manualmente.
+      EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL:-}
     stdin_open: true
     tty: true
     # O tunnel permite abrir o projeto no Expo Go mesmo quando a rede bloqueia
